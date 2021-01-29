@@ -2,6 +2,8 @@ package main.Controller;
 
 import main.Database.PostDAO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,8 +18,9 @@ public class ApiPostController {
     PostDAO postDAO;
 
     @GetMapping("/post")
-    public String getPosts(int offset,int limit,String mode){
-        return postDAO.getPost(offset,limit,mode);
+    public ResponseEntity getPosts(int offset, int limit, String mode){
+        String response = postDAO.getPost(offset,limit,mode);
+        return new ResponseEntity(response,HttpStatus.OK);
     }
 
     @GetMapping("/tag")
