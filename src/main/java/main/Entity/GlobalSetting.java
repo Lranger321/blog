@@ -1,22 +1,20 @@
 package main.Entity;
 
 import javax.persistence.*;
-import java.util.Date;
 
 @Entity
-@Table(name = "posts_votes")
-public class Vote {
+@Table(name = "global_settings")
+public class GlobalSetting {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
-    @ManyToOne
+    
     @Column(nullable = false)
-    private User user;
+    private String code;
 
     @Column(nullable = false)
-    private Date time;
+    private String name;
 
     @Column(nullable = false)
     private Boolean value;
@@ -29,20 +27,20 @@ public class Vote {
         this.id = id;
     }
 
-    public User getUser() {
-        return user;
+    public String getCode() {
+        return code;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setCode(String code) {
+        this.code = code;
     }
 
-    public Date getTime() {
-        return time;
+    public String getName() {
+        return name;
     }
 
-    public void setTime(Date time) {
-        this.time = time;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Boolean getValue() {

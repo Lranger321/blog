@@ -13,22 +13,30 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "is_active")
+    @Column(name = "is_active",nullable = false)
     private Boolean isActive;
 
-    @Column(name = "moderation_status")
+    @Column(name = "moderation_status",nullable = false)
     private ModerationStatus moderationStatus;
 
     @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "moderator_id",nullable = false)
+    private User moderator;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id",nullable = false)
     private User user;
 
+    @Column(nullable = false)
     private Date time;
 
+    @Column(nullable = false)
     private String title;
 
+    @Column(nullable = false)
     private String text;
 
-    @Column(name = "view_count")
+    @Column(name = "view_count",nullable = false)
     private int viewCount;
 
     @OneToMany
@@ -38,7 +46,6 @@ public class Post {
     @JoinTable(name = "tag2post",joinColumns = {@JoinColumn(name = "post_id")},
     inverseJoinColumns = {@JoinColumn(name = "tag_id")})
     private List<Tag> tagList;
-
 
     public int getId() {
         return id;
@@ -118,5 +125,13 @@ public class Post {
 
     public void setVotes(List<Vote> votes) {
         this.votes = votes;
+    }
+
+    public User getModerator() {
+        return moderator;
+    }
+
+    public void setModerator(User moderator) {
+        this.moderator = moderator;
     }
 }
