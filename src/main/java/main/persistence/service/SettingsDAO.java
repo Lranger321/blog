@@ -16,6 +16,7 @@ public class SettingsDAO {
     public HashMap<String,Boolean>  getSettings(){
         HashMap<String,Boolean> settings = new HashMap<>();
         repository.findAll().forEach(setting->{
+            System.out.println(setting.getName() + "  "+ setting.getValue());
             settings.put(setting.getName(),setting.getValue());
         });
         return settings;

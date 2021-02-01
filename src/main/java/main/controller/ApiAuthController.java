@@ -19,7 +19,7 @@ public class ApiAuthController {
 
     @GetMapping("/check")
     public AuthResponse authCheck(HttpSession session){
-        System.out.println(userDAO.checkAuth(session.getId()));
+        //System.out.println(userDAO.checkAuth(session.getId()));
         return userDAO.checkAuth(session.getId());
     }
 

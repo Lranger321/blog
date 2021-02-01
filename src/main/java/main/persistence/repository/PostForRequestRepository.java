@@ -12,10 +12,10 @@ public interface PostForRequestRepository extends JpaRepository<PostView, Intege
     @Query(value = "SELECT * FROM post_for_request ORDER BY timestamp", nativeQuery = true)
     List<PostView> getAllRecent();
 
-    @Query(value = "SELECT * FROM post_for_request ORDER BY commentCount", nativeQuery = true)
+    @Query(value = "SELECT * FROM post_for_request ORDER BY comment_count", nativeQuery = true)
     List<PostView> getAllPopular();
 
-    @Query(value = "SELECT * FROM post_for_request ORDER BY likeCount", nativeQuery = true)
+    @Query(value = "SELECT * FROM post_for_request ORDER BY like_count", nativeQuery = true)
     List<PostView> getAllBest();
 
     @Query(value = "SELECT * FROM post_for_request ORDER BY timestamp DESC", nativeQuery = true)

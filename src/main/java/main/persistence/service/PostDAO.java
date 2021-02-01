@@ -1,11 +1,16 @@
 package main.persistence.service;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import main.dto.CalendarInfo;
 import main.dto.PostDtoResponse;
 import main.dto.PostsInfo;
 import main.dto.UserDtoResponse;
+import main.persistence.entity.Post;
 import main.persistence.repository.PostForRequestRepository;
 import main.persistence.repository.PostRepository;
 import main.persistence.entity.PostView;
@@ -21,15 +26,17 @@ public class PostDAO {
     @Autowired
     PostForRequestRepository viewRepository;
 
+    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
 
     public PostsInfo getPost(int offset, int limit, String mode) {
         PostsInfo postsInfo = new PostsInfo();
         List<PostView> posts = (mode != null) ? getSortedPosts(mode) :
                 getSortedPosts("recent");
         int count = posts.size();
-        if(offset + limit < count){
+        if (offset + limit < count) {
             postsInfo.setPosts(createPostDtoList(posts.subList(offset, offset + limit)));
-        }else{
+        } else {
             postsInfo.setPosts(createPostDtoList(posts.subList(offset, count)));
         }
         postsInfo.setCount(count);
@@ -63,7 +70,7 @@ public class PostDAO {
 
 
     private List<PostDtoResponse> createPostDtoList(List<PostView> posts) {
-        List<PostDtoResponse> responseList =  new ArrayList<>();
+        List<PostDtoResponse> responseList = new ArrayList<>();
         posts.forEach(postView -> {
             UserDtoResponse user = new UserDtoResponse();
             user.setId(postView.getUserId());
@@ -74,6 +81,26 @@ public class PostDAO {
             responseList.add(post);
         });
         return responseList;
+    }
+
+    public CalendarInfo calendarInfo(String inputYear) {
+        CalendarInfo calendarInfo = new CalendarInfo();
+        List<Integer> years = new ArrayList<>();
+        HashMap<String, Integer> postsCalendar = new HashMap<>();
+        postRepository.getAllFromCurrentDate().stream().forEach(post -> {
+            String date = dateFormat.format(post.getTime().toString());
+            String year = date.split("-")[2];
+            System.out.println(date);
+            if (!years.contains(year)) {
+                years.add(Integer.valueOf(year));
+            }
+            if (year.equals(inputYear)) {
+                postsCalendar.put(date, postsCalendar.getOrDefault(date, 0) + 1);
+            }
+        });
+        calendarInfo.setPosts(postsCalendar);
+        calendarInfo.setYears(years);
+        return calendarInfo;
     }
 
 
