@@ -6,6 +6,8 @@ public class PostDtoResponse {
 
     private int id;
 
+    private long timestamp;
+
     private String title;
 
     private String announce;
@@ -18,7 +20,7 @@ public class PostDtoResponse {
 
     private int viewCount;
 
-    public PostDtoResponse(int id,UserDtoResponse user, String title, String announce,
+    public PostDtoResponse(int id,long timestamp, UserDtoResponse user, String title, String announce,
                            int likeCount, int dislikeCount, int commentCount, int viewCount) {
         this.user = user;
         this.id = id;
@@ -92,5 +94,13 @@ public class PostDtoResponse {
 
     public void setViewCount(int viewCount) {
         this.viewCount = viewCount;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 }

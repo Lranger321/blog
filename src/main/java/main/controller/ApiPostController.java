@@ -40,4 +40,10 @@ public class ApiPostController {
         return postDAO.getPost(offset,limit,mode);
     }
 
+
+    @GetMapping("/byDate")
+    public PostsInfo getPostsByDate(int offset,int limit,String date){
+        return postDAO.getPostByDate(offset, limit, date);
+    }
+
 }
