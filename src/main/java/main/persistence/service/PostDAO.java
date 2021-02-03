@@ -3,6 +3,7 @@ package main.persistence.service;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -75,8 +76,9 @@ public class PostDAO {
             UserDtoResponse user = new UserDtoResponse();
             user.setId(postView.getUserId());
             user.setName(postView.getName());
-            PostDtoResponse post = new PostDtoResponse(postView.getId(), user, postView.getTitle(),
-                    postView.getAnnounce(), postView.getLikeCount(), postView.getDislikeCount(),
+            PostDtoResponse post = new PostDtoResponse(postView.getId(),postView.getTimestamp(),
+                    user, postView.getTitle(), postView.getAnnounce(),
+                    postView.getLikeCount(), postView.getDislikeCount(),
                     postView.getCommentCount(), postView.getViewCount());
             responseList.add(post);
         });
@@ -101,6 +103,25 @@ public class PostDAO {
         calendarInfo.setPosts(postsCalendar);
         calendarInfo.setYears(years);
         return calendarInfo;
+    }
+
+    public PostsInfo getPostByDate(int offset,int limit,String date){
+        PostsInfo postsInfo = new PostsInfo();
+        List<PostDtoResponse> posts = createPostDtoList(getSortedPosts("recent"));
+        posts.removeIf(post->{
+            String postDate = dateFormat.format(new Date(post.getTimestamp()));
+            return !postDate.equals(date);
+        });
+
+        int count = posts.size();
+        postsInfo.setCount(count);
+        if (offset + limit < count) {
+            postsInfo.setPosts(posts.subList(offset, offset + limit));
+        } else {
+            postsInfo.setPosts(posts.subList(offset, count));
+        }
+        postsInfo.setPosts(posts);
+        return postsInfo;
     }
 
 
