@@ -18,6 +18,7 @@ public class ApiPostController {
 
     @GetMapping("/post")
     public PostsInfo getPosts(int offset,int limit,String mode){
+        System.out.println("check response: "+postDAO.getPost(offset,limit,mode));
         return postDAO.getPost(offset,limit,mode);
     }
 

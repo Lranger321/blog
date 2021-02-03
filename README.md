@@ -1,5 +1,6 @@
 # blog
 ###Dev branch
+
 CREATE TABLE users
 (
     id           int          NOT NULL AUTO_INCREMENT,
@@ -12,6 +13,7 @@ CREATE TABLE users
     photo        TEXT,
     PRIMARY KEY (id)
 );
+
 CREATE TABLE posts
 (
     id                int                                  NOT NULL AUTO_INCREMENT,
@@ -27,6 +29,7 @@ CREATE TABLE posts
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (moderator_id) REFERENCES users (id)
 );
+
 CREATE TABLE posts_votes
 (
     id      int      NOT NULL AUTO_INCREMENT,
@@ -38,12 +41,14 @@ CREATE TABLE posts_votes
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (post_id) REFERENCES posts (id)
 );
+
 CREATE TABLE tags
 (
     id   int          NOT NULL,
     name VARCHAR(255) NOT NULL,
     PRIMARY KEY (id)
 );
+
 CREATE TABLE tag2post
 (
     id      int NOT NULL AUTO_INCREMENT,
@@ -53,6 +58,7 @@ CREATE TABLE tag2post
     FOREIGN KEY (post_id) REFERENCES posts (id),
     FOREIGN KEY (tag_id) REFERENCES tags (id)
 );
+
 CREATE TABLE post_comments
 (
     id        int      NOT NULL AUTO_INCREMENT,
@@ -67,6 +73,7 @@ CREATE TABLE post_comments
     FOREIGN KEY (user_id) REFERENCES users (id)
 
 );
+
 CREATE TABLE captcha_codes
 (
     id          int      NOT NULL AUTO_INCREMENT,
@@ -83,6 +90,7 @@ CREATE TABLE global_settings
     value VARCHAR(255) NOT NULL,
     PRIMARY KEY (id)
 );
+
 
 DROP TABLE captcha_codes;
 DROP TABLE global_settings;

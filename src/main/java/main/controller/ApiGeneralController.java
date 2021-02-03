@@ -36,7 +36,7 @@ public class ApiGeneralController {
 
     @GetMapping("/settings")
     public HashMap<String, Boolean> getSettings(){
-        System.out.println(settingsDAO.getSettings());
+       // System.out.println(settingsDAO.getSettings());
         return settingsDAO.getSettings();
     }
 

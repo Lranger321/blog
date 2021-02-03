@@ -1,12 +1,13 @@
 package main.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PostsInfo {
 
-    private int count;
+    private int count = 0;
 
-    private List<PostDtoResponse> posts;
+    private List<PostDtoResponse> posts = new ArrayList<>();
 
     public int getCount() {
         return count;

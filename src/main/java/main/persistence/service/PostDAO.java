@@ -64,7 +64,6 @@ public class PostDAO {
                 posts = viewRepository.getAllEarly();
                 break;
         }
-        System.out.println(posts);
         return posts;
     }
 

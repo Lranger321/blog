@@ -1,5 +1,6 @@
 package main.controller;
 
+import com.google.gson.Gson;
 import main.persistence.service.UserDAO;
 import main.dto.AuthResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,6 @@ public class ApiAuthController {
 
     @GetMapping("/check")
     public AuthResponse authCheck(HttpSession session){
-        //System.out.println(userDAO.checkAuth(session.getId()));
         return userDAO.checkAuth(session.getId());
     }
 
