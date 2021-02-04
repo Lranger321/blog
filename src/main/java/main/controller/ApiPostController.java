@@ -1,7 +1,7 @@
 package main.controller;
 
-import main.persistence.service.PostDAO;
 import main.dto.PostsInfo;
+import main.persistence.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,40 +10,25 @@ import org.springframework.web.bind.annotation.RestController;
 
 //Controller for /api/post/*
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/post")
 public class ApiPostController {
 
     @Autowired
-    PostDAO postDAO;
+    PostService postService;
 
-    @GetMapping("/post")
-    public PostsInfo getPosts(int offset,int limit,String mode){
-        System.out.println("check response: "+postDAO.getPost(offset,limit,mode));
-        return postDAO.getPost(offset,limit,mode);
+    @GetMapping("")
+    public PostsInfo getPosts(int offset, int limit, String mode){
+        return postService.getPosts(offset,limit,mode);
     }
-
-    @GetMapping("/tag")
-    public String getTag(){
-        return "{" +
-                "\"tags\":" +
-                "[" +
-                "{\"name\":\"Java\", \"weight\":1}," +
-                "{\"name\":\"Spring\", \"weight\":0.56}," +
-                "{\"name\":\"Hibernate\", \"weight\":0.22}," +
-                "{\"name\":\"Hadoop\", \"weight\":0.17}" +
-                "]" +
-                "}";
-    }
-
-    @GetMapping("/search")
-    public PostsInfo searchPosts(int offset, int limit, String mode){
-        return postDAO.getPost(offset,limit,mode);
-    }
-
 
     @GetMapping("/byDate")
     public PostsInfo getPostsByDate(int offset,int limit,String date){
-        return postDAO.getPostByDate(offset, limit, date);
+        return postService.getPostByDate(offset, limit, date);
+    }
+
+    @GetMapping("/byTag")
+    public PostsInfo getPostByTag(int offset,int limit,String tag){
+        return postService.getPostByTag(offset,limit,tag);
     }
 
 }

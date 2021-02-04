@@ -1,7 +1,6 @@
 package main.controller;
 
-import com.google.gson.Gson;
-import main.persistence.service.UserDAO;
+import main.persistence.UserDAO;
 import main.dto.AuthResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

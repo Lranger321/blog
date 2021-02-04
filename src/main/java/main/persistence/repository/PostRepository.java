@@ -9,6 +9,6 @@ import java.util.List;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Integer> {
 
-    @Query(value = "SELECT * FROM posts WHERE moderation_status = 1 AND is_active = 1",nativeQuery = true)
-    List<Post> getAllFromCurrentDate();
+    @Query(value = "SELECT * FROM posts WHERE moderation_status = 'ACCEPTED' AND is_active = 1",nativeQuery = true)
+    List<Post> getAllActiveAndAccepted();
 }

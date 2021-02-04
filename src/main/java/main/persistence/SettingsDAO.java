@@ -1,4 +1,4 @@
-package main.persistence.service;
+package main.persistence;
 
 import com.google.gson.Gson;
 import main.persistence.repository.GlobalSettingsRepository;

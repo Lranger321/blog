@@ -16,6 +16,7 @@ public class Post {
     @Column(name = "is_active",nullable = false)
     private Boolean isActive;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "moderation_status",nullable = false)
     private ModerationStatus moderationStatus;
 
@@ -40,11 +41,16 @@ public class Post {
     private int viewCount;
 
     @OneToMany
+    @JoinColumn(name = "post_id", referencedColumnName = "id")
     private List<Vote> votes;
 
+    @OneToMany
+    @JoinColumn(name = "post_id", referencedColumnName = "id")
+    private List<Comment> comments;
+
     @ManyToMany
-    @JoinTable(name = "tag2post",joinColumns = {@JoinColumn(name = "post_id")},
-    inverseJoinColumns = {@JoinColumn(name = "tag_id")})
+    @JoinTable(name = "tag2post",joinColumns = {@JoinColumn(name = "tag_id")},
+    inverseJoinColumns = {@JoinColumn(name = "post_id")})
     private List<Tag> tagList;
 
     public int getId() {
@@ -133,5 +139,13 @@ public class Post {
 
     public void setModerator(User moderator) {
         this.moderator = moderator;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 }

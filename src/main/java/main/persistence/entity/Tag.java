@@ -3,6 +3,7 @@ package main.persistence.entity;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "tags")
 public class Tag {
 
     @Id

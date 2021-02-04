@@ -1,4 +1,4 @@
-package main.persistence.service;
+package main.persistence;
 
 import main.dto.TagInfo;
 import main.dto.TagStorage;

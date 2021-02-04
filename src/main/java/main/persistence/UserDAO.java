@@ -1,4 +1,4 @@
-package main.persistence.service;
+package main.persistence;
 
 import main.persistence.repository.UserRepository;
 import main.persistence.entity.User;
@@ -17,14 +17,14 @@ public class UserDAO {
     HashMap<String, User> session = new HashMap<>();
 
     public AuthResponse checkAuth(String id) {
+        System.out.println(id);
         AuthResponse response = new AuthResponse();
-        if (session.containsKey(id)) {
+        if(session.containsKey(id)) {
             response.setResult(true);
-            return response;
         } else {
             response.setResult(false);
-            return response;
         }
+        return response;
     }
 
 

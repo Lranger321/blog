@@ -30,6 +30,7 @@ public class PostDtoResponse {
         this.dislikeCount = dislikeCount;
         this.commentCount = commentCount;
         this.viewCount = viewCount;
+        this.timestamp = timestamp;
     }
 
     public UserDtoResponse getUser() {
