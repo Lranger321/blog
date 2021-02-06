@@ -1,8 +1,7 @@
-package main.persistence;
+package main.persistence.dao;
 
 import main.persistence.repository.UserRepository;
 import main.persistence.entity.User;
-import main.dto.AuthResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,16 +15,12 @@ public class UserDAO {
 
     HashMap<String, User> session = new HashMap<>();
 
-    public AuthResponse checkAuth(String id) {
-        System.out.println(id);
-        AuthResponse response = new AuthResponse();
+    public User checkAuth(String id) {
+        User user = null;
         if(session.containsKey(id)) {
-            response.setResult(true);
-        } else {
-            response.setResult(false);
+            user = session.get(id);
         }
-        return response;
+        return user;
     }
-
 
 }

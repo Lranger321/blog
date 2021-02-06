@@ -2,10 +2,11 @@ package main.controller;
 
 
 import main.dto.CalendarInfo;
-import main.dto.PostsInfo;
+import main.dto.TagStorage;
 import main.persistence.service.PostService;
-import main.persistence.SettingsDAO;
 import main.dto.InitStorage;
+import main.persistence.service.SettingsService;
+import main.persistence.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,10 +21,13 @@ public class ApiGeneralController {
     private final InitStorage initStorage;
 
     @Autowired
-    SettingsDAO settingsDAO;
+    SettingsService settingsService;
 
     @Autowired
     PostService postService;
+
+    @Autowired
+    TagService tagService;
 
     public ApiGeneralController(InitStorage initStorage) {
         this.initStorage = initStorage;
@@ -36,7 +40,7 @@ public class ApiGeneralController {
 
     @GetMapping("/settings")
     public HashMap<String, Boolean> getSettings() {
-        return settingsDAO.getSettings();
+        return settingsService.getSettings();
     }
 
     @GetMapping("/calendar")
@@ -45,21 +49,8 @@ public class ApiGeneralController {
     }
 
     @GetMapping("/tag")
-    public String getTag() {
-        return "{" +
-                "\"tags\":" +
-                "[" +
-                "{\"name\":\"Java\", \"weight\":1}," +
-                "{\"name\":\"Spring\", \"weight\":0.56}," +
-                "{\"name\":\"Hibernate\", \"weight\":0.22}," +
-                "{\"name\":\"Hadoop\", \"weight\":0.17}" +
-                "]" +
-                "}";
-    }
-
-    @GetMapping("/search")
-    public PostsInfo searchPosts(int offset, int limit, String mode) {
-        return postService.getPosts(offset, limit, mode);
+    public TagStorage getTag() {
+        return tagService.countAllWeight();
     }
 
 }

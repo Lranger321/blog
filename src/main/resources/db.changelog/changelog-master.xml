@@ -145,6 +145,53 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="comments" author="root">
+        <insert tableName="post_comments">
+            <column name="post_id" value="3"/>
+            <column name="user_id" value="1"/>
+            <column name="time" value="${now}"/>
+            <column name="text" value="Good post"/>
+        </insert>
+        <insert tableName="post_comments">
+            <column name="post_id" value="3"/>
+            <column name="parent_id" value="1"/>
+            <column name="user_id" value="1"/>
+            <column name="time" value="${now}"/>
+            <column name="text" value="Good post"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="tags" author="root">
+        <insert tableName="tags">
+            <column name="id" value="1"/>
+            <column name="name" value="Java"/>
+        </insert>
+        <insert tableName="tags">
+            <column name="id" value="2"/>
+            <column name="name" value="Spring"/>
+        </insert>
+        <insert tableName="tags">
+            <column name="id" value="3"/>
+            <column name="name" value="Hadoop"/>
+        </insert>
+        <insert tableName="tag2post">
+            <column name="post_id" value="1"/>
+            <column name="tag_id" value="1"/>
+        </insert>
+        <insert tableName="tag2post">
+            <column name="post_id" value="2"/>
+            <column name="tag_id" value="1"/>
+        </insert>
+        <insert tableName="tag2post">
+            <column name="post_id" value="1"/>
+            <column name="tag_id" value="2"/>
+        </insert>
+        <insert tableName="tag2post">
+            <column name="post_id" value="3"/>
+            <column name="tag_id" value="3"/>
+        </insert>
+    </changeSet>
+
     <changeSet id="input" author="root">
         <insert tableName="global_settings">
             <column name="code" value="MULTIUSER_MODE"/>

@@ -1,7 +1,7 @@
 package main.controller;
 
-import main.persistence.UserDAO;
 import main.dto.AuthResponse;
+import main.persistence.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,12 +15,11 @@ import javax.servlet.http.HttpSession;
 public class ApiAuthController {
 
     @Autowired
-    UserDAO userDAO;
+    UserService userService;
 
     @GetMapping("/check")
     public AuthResponse authCheck(HttpSession session){
-        return userDAO.checkAuth(session.getId());
+        return userService.checkAuth(session.getId());
     }
-
 
 }
