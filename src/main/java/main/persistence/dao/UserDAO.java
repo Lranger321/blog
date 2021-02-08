@@ -11,7 +11,7 @@ import java.util.HashMap;
 public class UserDAO {
 
     @Autowired
-    UserRepository repository;
+    UserRepository userRepository;
 
     HashMap<String, User> session = new HashMap<>();
 
@@ -21,6 +21,14 @@ public class UserDAO {
             user = session.get(id);
         }
         return user;
+    }
+
+    public void saveUser(User user){
+        userRepository.save(user);
+    }
+
+    public int getCountUserByEmail(String email){
+        return userRepository.countByEmail(email);
     }
 
 }

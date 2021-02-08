@@ -1,6 +1,7 @@
 package main.dto;
 
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 public class PostViewResponse {
 
@@ -13,9 +14,13 @@ public class PostViewResponse {
     private int dislikeCount;
     private int viewCount;
     private List<CommentInfo> comments;
+    private List<String> tags;
 
-    public PostViewResponse(int id, long timestamp, UserDtoResponse user, String title, String text,
-                            int likeCount, int dislikeCount, int viewCount, List<CommentInfo> comments) {
+    public PostViewResponse(int id, long timestamp,
+                            UserDtoResponse user, String title,
+                            String text, int likeCount, int dislikeCount,
+                            int viewCount, List<CommentInfo> comments,
+                            List<String> tags) {
         this.id = id;
         this.timestamp = timestamp;
         this.user = user;
@@ -25,6 +30,15 @@ public class PostViewResponse {
         this.dislikeCount = dislikeCount;
         this.viewCount = viewCount;
         this.comments = comments;
+        this.tags = tags;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 
     public int getId() {

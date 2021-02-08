@@ -39,14 +39,18 @@ public class Converter {
 
     public static AuthResponse createAuthResponse(Boolean status, User user) {
         AuthResponse authResponse = new AuthResponse();
-        authResponse.setResult(true);
+        authResponse.setResult(status);
         return authResponse;
     }
 
     public static PostViewResponse createPostViewResponse(Post post) {
         UserDtoResponse userDtoResponse = new UserDtoResponse();
+        userDtoResponse.setName(post.getUser().getName());
+        userDtoResponse.setId(post.getUser().getId());
         int likeCount = (int) post.getVotes().stream().filter(Vote::getValue).count();
         int disLikeCount = (int) post.getVotes().stream().filter(vote -> !vote.getValue()).count();
+        List<String> tags = new ArrayList<>();
+        post.getTagList().forEach(tag -> tags.add(tag.getName()));
         PostViewResponse postViewResponse = new PostViewResponse(
                 post.getId(),
                 post.getTime().getTime() / 1000,
@@ -56,7 +60,8 @@ public class Converter {
                 likeCount,
                 disLikeCount,
                 post.getViewCount(),
-                commentInfos(post.getComments())
+                commentInfos(post.getComments()),
+                tags
         );
         return postViewResponse;
     }
@@ -82,7 +87,6 @@ public class Converter {
         });
         return commentInfos;
     }
-
 
 
 

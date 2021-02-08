@@ -4,6 +4,7 @@ spring.datasource.password: root
 spring.jpa.hibernate.ddl-auto: none
 spring.liquibase.enabled: true
 spring.liquibase.change-log: classpath:db.changelog\changelog-master.xml
+spring.jackson.serialization-inclusion: non_null
 
 blog.title: DevPub
 blog.subtitle: Рассказы разработчиков

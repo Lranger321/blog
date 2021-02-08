@@ -8,7 +8,7 @@ public class CalendarInfo {
 
     List<Integer> years;
 
-    HashMap<String,Integer> posts;
+    HashMap<String, Integer> posts;
 
     public List<Integer> getYears() {
         return years;
@@ -25,4 +25,6 @@ public class CalendarInfo {
     public void setPosts(HashMap<String, Integer> posts) {
         this.posts = posts;
     }
+
+    
 }

@@ -1,5 +1,6 @@
 package main.dto;
 
+
 public class PostDtoResponse {
 
     private UserDtoResponse user;

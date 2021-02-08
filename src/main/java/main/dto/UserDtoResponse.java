@@ -1,5 +1,8 @@
 package main.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDtoResponse {
 
     private int id;
@@ -9,10 +12,6 @@ public class UserDtoResponse {
     private String photo;
 
     private String email;
-
-    private Boolean moderation;
-
-    private int moderationCount;
 
     private Boolean settings;
 
@@ -30,22 +29,6 @@ public class UserDtoResponse {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public Boolean getModeration() {
-        return moderation;
-    }
-
-    public void setModeration(Boolean moderation) {
-        this.moderation = moderation;
-    }
-
-    public int getModerationCount() {
-        return moderationCount;
-    }
-
-    public void setModerationCount(int moderationCount) {
-        this.moderationCount = moderationCount;
     }
 
     public Boolean getSettings() {
