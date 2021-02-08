@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <property name="now" value="NOW()" dbms="mysql"/>
+
+    <changeSet author="root" id="changelog-1.0" runOnChange="true">
+        <createTable tableName="users">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="is_moderator" type="tinyint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reg_time" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="varchar(255)"/>
+            <column name="photo" type="text"/>
+        </createTable>
+        <createTable tableName="posts">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="is_active" type="tinyint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="moderation_status" type="enum('NEW','ACCEPTED','DECLINED')">
+                <constraints nullable="false"/>
+            </column>
+            <column name="moderator_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="time" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="text" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="view_count" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="posts_votes">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="user_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="post_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="time" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="tinyint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="tags">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="tag2post">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="post_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tag_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="post_comments">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="parent_id" type="int">
+
+            </column>
+            <column name="post_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="time" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="text" type="text">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="captcha_codes">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="time" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="tinytext">
+                <constraints nullable="false"/>
+            </column>
+            <column name="secret_code" type="tinytext">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="global_settings">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="code" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="comments" author="root">
+        <insert tableName="post_comments">
+            <column name="post_id" value="3"/>
+            <column name="user_id" value="1"/>
+            <column name="time" value="${now}"/>
+            <column name="text" value="Good post"/>
+        </insert>
+        <insert tableName="post_comments">
+            <column name="post_id" value="3"/>
+            <column name="parent_id" value="1"/>
+            <column name="user_id" value="1"/>
+            <column name="time" value="${now}"/>
+            <column name="text" value="Good post"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="tags" author="root">
+        <insert tableName="tags">
+            <column name="id" value="1"/>
+            <column name="name" value="Java"/>
+        </insert>
+        <insert tableName="tags">
+            <column name="id" value="2"/>
+            <column name="name" value="Spring"/>
+        </insert>
+        <insert tableName="tags">
+            <column name="id" value="3"/>
+            <column name="name" value="Hadoop"/>
+        </insert>
+        <insert tableName="tag2post">
+            <column name="post_id" value="1"/>
+            <column name="tag_id" value="1"/>
+        </insert>
+        <insert tableName="tag2post">
+            <column name="post_id" value="2"/>
+            <column name="tag_id" value="1"/>
+        </insert>
+        <insert tableName="tag2post">
+            <column name="post_id" value="1"/>
+            <column name="tag_id" value="2"/>
+        </insert>
+        <insert tableName="tag2post">
+            <column name="post_id" value="3"/>
+            <column name="tag_id" value="3"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="input" author="root">
+        <insert tableName="global_settings">
+            <column name="code" value="MULTIUSER_MODE"/>
+            <column name="name" value="MULTIUSER_MODE"/>
+            <column name="value" value="false"/>
+        </insert>
+        <insert tableName="global_settings">
+            <column name="code" value="STATISTICS_IS_PUBLIC"/>
+            <column name="name" value="STATISTICS_IS_PUBLIC"/>
+            <column name="value" value="true"/>
+        </insert>
+        <insert tableName="global_settings">
+            <column name="code" value="POST_PREMODERATION"/>
+            <column name="name" value="POST_PREMODERATION"/>
+            <column name="value" value="true"/>
+        </insert>
+        <insert tableName="users">
+            <column name="is_moderator" value="0"/>
+            <column name="reg_time" value="${now}"/>
+            <column name="name" value="root"/>
+            <column name="email" value="nikita30.07@mail.ru"/>
+            <column name="password" value="root"/>
+        </insert>
+        <insert tableName="users">
+            <column name="is_moderator" value="1"/>
+            <column name="reg_time" value="${now}"/>
+            <column name="name" value="admin"/>
+            <column name="email" value="nikita30.07@mail.ru"/>
+            <column name="password" value="admin"/>
+        </insert>
+        <insert tableName="posts">
+            <column name="is_active" value="1"/>
+            <column name="moderation_status" value="ACCEPTED"/>
+            <column name="moderator_id" value="2"/>
+            <column name="user_id" value="1"/>
+            <column name="time" value="${now}"/>
+            <column name="title" value="Название"/>
+            <column name="text" value="Здесь текст"/>
+            <column name="view_count" value="60"/>
+        </insert>
+        <insert tableName="posts">
+            <column name="is_active" value="1"/>
+            <column name="moderation_status" value="ACCEPTED"/>
+            <column name="moderator_id" value="2"/>
+            <column name="user_id" value="1"/>
+            <column name="time" value="${now}"/>
+            <column name="title" value="Название"/>
+            <column name="text" value="Здесь текст"/>
+            <column name="view_count" value="1020"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="votes" author="root">
+        <insert tableName="posts_votes">
+            <column name="user_id" value="1"/>
+            <column name="post_id" value="1"/>
+            <column name="time" value="${now}"/>
+            <column name="value" value="1"/>
+        </insert>
+        <insert tableName="posts_votes">
+            <column name="user_id" value="2"/>
+            <column name="post_id" value="1"/>
+            <column name="time" value="${now}"/>
+            <column name="value" value="1"/>
+        </insert>
+        <insert tableName="posts_votes">
+            <column name="user_id" value="1"/>
+            <column name="post_id" value="1"/>
+            <column name="time" value="${now}"/>
+            <column name="value" value="-1"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>
