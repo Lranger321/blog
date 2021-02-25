@@ -1,11 +1,12 @@
 package main.persistence.service;
 
-import com.google.gson.Gson;
 import main.dto.CalendarInfo;
 import main.dto.PostDtoResponse;
 import main.dto.PostViewResponse;
 import main.dto.PostsInfo;
 import main.persistence.dao.PostDAO;
+import main.persistence.dao.UserDAO;
+import main.persistence.entity.ModerationStatus;
 import main.persistence.entity.Post;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,30 +24,26 @@ public class PostService {
     @Autowired
     private PostDAO postDAO;
 
+    @Autowired
+    private UserDAO userDAO;
+
     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 
     public PostsInfo getPosts(int offset, int limit, String mode) {
         List<PostDtoResponse> posts = Converter.createPostDtoList(postDAO.getPosts(mode,offset,limit));
         int count = postDAO.getPostCount();
-        return getPostInfo(posts, count);
+        return Converter.convertToPostsInfo(posts, count);
     }
 
     public PostsInfo getPostByDate(int offset, int limit, String date) {
         List<PostDtoResponse> posts = Converter.createPostDtoList(postDAO.getPostByDate(date));
-        return getPostInfo(posts, posts.size());
+        return Converter.convertToPostsInfo(posts, posts.size());
     }
 
     public PostsInfo getPostByTag(int offset, int limit, String tag) {
         List<PostDtoResponse> posts = Converter.createPostDtoList(postDAO.getPostByTag(tag));
-        return getPostInfo(posts,posts.size());
-    }
-
-    private PostsInfo getPostInfo(List<PostDtoResponse> posts, int count) {
-        PostsInfo postsInfo = new PostsInfo();
-        postsInfo.setCount(count);
-        postsInfo.setPosts(posts);
-        return postsInfo;
+        return Converter.convertToPostsInfo(posts,posts.size());
     }
 
     public CalendarInfo getCalendar(String inputYear) {
@@ -72,7 +69,7 @@ public class PostService {
     public PostsInfo searchPosts(int offset, int limit, String query) {
         List<PostDtoResponse> posts = Converter.createPostDtoList(postDAO.searchPosts(offset, limit, query));
         int count =postDAO.getCountByQuery(query);
-        return getPostInfo(posts,count);
+        return Converter.convertToPostsInfo(posts,count);
     }
 
     public PostViewResponse getPostById(int id) {
@@ -84,6 +81,27 @@ public class PostService {
             postViewResponse = Converter.createPostViewResponse(post);
         }
         return postViewResponse;
+    }
+
+    public PostsInfo getPostsForModeration(int offset,int limit,String status,String userName){
+        List<Post> posts = new ArrayList<>();
+        int count = 0;
+            switch (status) {
+                case "new":
+                    posts = postDAO.getNewPostsForModeration(offset, limit);
+                    count = 0;
+                    break;
+                case "declined":
+                    posts = postDAO.getPostForModeration(offset,limit, ModerationStatus.DECLINED,userName);
+                    count = 0;
+                    break;
+                case "accepted":
+                    posts = postDAO.getPostForModeration(offset,limit,ModerationStatus.ACCEPTED,userName);
+                    count = 0;
+                    break;
+            }
+            List<PostDtoResponse> postDtoResponseList = Converter.createPostDtoList(posts);
+        return Converter.convertToPostsInfo(postDtoResponseList,count);
     }
 
 

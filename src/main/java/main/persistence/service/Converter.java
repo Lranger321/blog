@@ -34,6 +34,13 @@ public class Converter {
         return responseList;
     }
 
+    public static PostsInfo convertToPostsInfo(List<PostDtoResponse> posts, int count) {
+        PostsInfo postsInfo = new PostsInfo();
+        postsInfo.setCount(count);
+        postsInfo.setPosts(posts);
+        return postsInfo;
+    }
+
     public static AuthResponse createAuthResponse(Boolean status) {
         AuthResponse authResponse = new AuthResponse();
         authResponse.setResult(status);

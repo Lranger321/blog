@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import main.persistence.entity.ModerationStatus;
 import main.persistence.entity.Post;
 import main.persistence.entity.Tag;
+import main.persistence.entity.User;
 import main.persistence.repository.PostPageRepository;
 import main.persistence.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,8 +95,6 @@ public class PostDAO {
 
     public List<Post> searchPosts(int offset, int limit, String text) {
         Pageable pageable = PageRequest.of(offset, limit + offset);
-        System.out.println("For text:"+text);
-        postPageRepository.searchByText(pageable, text).forEach(System.out::println);
         return postPageRepository.searchByText(pageable, text);
     }
 
@@ -110,6 +109,22 @@ public class PostDAO {
     public int getPostCount() {
         return (int) postRepository.count();
     }
+
+    public List<Post> getPostByUserId(int offset,int limit,String email){
+        Pageable pageable = PageRequest.of(offset,offset+limit);
+        return postPageRepository.findByUserId(pageable,email);
+    }
+
+    public List<Post> getNewPostsForModeration(int offset,int limit){
+        Pageable pageable = PageRequest.of(offset,offset+limit);
+        return postPageRepository.findAllNewForModeration(pageable);
+    }
+
+    public List<Post> getPostForModeration(int offset,int limit,ModerationStatus moderationStatus,String email){
+        Pageable pageable = PageRequest.of(offset,limit);
+        return postPageRepository.findAllForModeration(pageable,moderationStatus,email);
+    }
+
 
 
 }

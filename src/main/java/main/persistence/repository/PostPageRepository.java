@@ -25,4 +25,16 @@ public interface PostPageRepository extends PagingAndSortingRepository<Post, Int
     @Query("FROM Post p where p.text like concat('%',:search_text,'%')")
     List<Post> searchByText(Pageable page, @Param("search_text") String Text);
 
+    @Query("FROM Post p where p.moderationStatus='NEW' order by p.time DESC")
+    List<Post> findAllNewForModeration(Pageable pageable);
+
+    @Query("FROM Post p where p.moderationStatus=:moderation_status AND p.moderator.email =:moderator_email")
+    List<Post> findAllForModeration(Pageable pageable,
+                                    @Param("moderation_status") ModerationStatus moderationStatus,
+                                    @Param("moderator_email") String email);
+
+    @Query("FROM Post p where p.user.email = :email")
+    List<Post> findByUserId(Pageable pageable,@Param("email") String email);
+
+
 }

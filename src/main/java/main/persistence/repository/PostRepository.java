@@ -41,4 +41,5 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query("SELECT count(p) FROM Post p where p.text like concat('%',:search_text,'%')")
     long countByText(@Param("search_text") String Text);
 
+    
 }
