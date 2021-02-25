@@ -11,17 +11,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
-//Controller for /api/post/*
 @RestController
 @RequestMapping("/api/post")
 public class ApiPostController {
 
     @Autowired
-    PostService postService;
+    private PostService postService;
 
     @GetMapping("")
-    public PostsInfo getPosts(int offset, int limit, String mode){
+    public PostsInfo getPosts(int limit, int offset, String mode){
+        System.out.println(offset+"  "+limit);
         return postService.getPosts(offset,limit,mode);
     }
 
@@ -38,6 +37,7 @@ public class ApiPostController {
 
     @GetMapping("/search")
     public PostsInfo searchPosts(int offset, int limit, String query) {
+        System.out.println(offset+" "+limit+" "+query);
         return postService.searchPosts(offset, limit, query);
     }
 

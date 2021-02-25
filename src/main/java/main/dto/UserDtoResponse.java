@@ -15,6 +15,26 @@ public class UserDtoResponse {
 
     private Boolean settings;
 
+    private Boolean moderation;
+
+    private int moderationCount;
+
+    public Boolean getModeration() { 
+        return moderation;
+    }
+
+    public void setModeration(Boolean moderation) {
+        this.moderation = moderation;
+    }
+
+    public int getModerationCount() {
+        return moderationCount;
+    }
+
+    public void setModerationCount(int moderationCount) {
+        this.moderationCount = moderationCount;
+    }
+
     public String getPhoto() {
         return photo;
     }

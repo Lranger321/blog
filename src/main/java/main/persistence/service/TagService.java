@@ -16,12 +16,10 @@ import java.util.List;
 public class TagService {
 
     @Autowired
-    TagDAO tagDAO;
+    private TagDAO tagDAO;
 
     @Autowired
-    PostDAO postDAO;
-
-    private double maxWeight = 0;
+    private PostDAO postDAO;
 
     public TagStorage countAllWeight() {
         TagStorage tagStorage = new TagStorage();
@@ -36,7 +34,7 @@ public class TagService {
 
 
     private Double countTagWeight(String name) {
-        List<Post> posts = postDAO.getPosts("recent");
+        List<Post> posts = postDAO.getPosts("recent", 0, postDAO.getPostCount());
         long countOfPosts = posts.size();
         long countOfPostsWithTag = posts.stream()
                 .filter(post -> {
@@ -60,32 +58,31 @@ public class TagService {
     }
 
     private double findMaxWeight() {
-        if (maxWeight == 0) {
-            List<Post> posts = postDAO.getPosts("recent");
-            long countOfPosts = posts.size();
-            HashMap<String, Integer> count = new HashMap<>();
-            tagDAO.getTags().forEach(tag -> {
-                count.put(tag.getName(), (int)
-                        posts.stream().filter(post -> {
-                            boolean containsTag = false;
-                            for (Tag postTag : post.getTagList()) {
-                                if (postTag.getName().equals(tag.getName())) {
-                                    containsTag = true;
-                                    break;
-                                }
-
+        double maxWeight = 0;
+        List<Post> posts = postDAO.getPosts("recent", 0, postDAO.getPostCount());
+        long countOfPosts = posts.size();
+        HashMap<String, Integer> count = new HashMap<>();
+        tagDAO.getTags().forEach(tag -> {
+            count.put(tag.getName(), (int)
+                    posts.stream().filter(post -> {
+                        boolean containsTag = false;
+                        for (Tag postTag : post.getTagList()) {
+                            if (postTag.getName().equals(tag.getName())) {
+                                containsTag = true;
+                                break;
                             }
-                            return containsTag;
-                        }).count());
-            });
-            int max = 0;
-            for (String name : count.keySet()) {
-                if (max < count.get(name)) {
-                    max = count.get(name);
-                }
+
+                        }
+                        return containsTag;
+                    }).count());
+        });
+        int max = 0;
+        for (String name : count.keySet()) {
+            if (max < count.get(name)) {
+                max = count.get(name);
             }
-            maxWeight = max / (double) countOfPosts;
         }
+        maxWeight = max / (double) countOfPosts;
         return maxWeight;
     }
 

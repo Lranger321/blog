@@ -9,10 +9,14 @@ import org.springframework.stereotype.Service;
 public class CaptchaDAO {
 
     @Autowired
-    CaptchaRepository captchaRepository;
+    private CaptchaRepository captchaRepository;
 
     public void saveCaptcha(CaptchaCode captchaCode){
         captchaRepository.save(captchaCode);
+    }
+
+    public CaptchaCode getCaptcha(String captchaCode){
+        return  captchaRepository.findBySecretCode(captchaCode).orElse(null);
     }
 
 }

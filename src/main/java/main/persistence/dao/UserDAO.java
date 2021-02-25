@@ -3,15 +3,17 @@ package main.persistence.dao;
 import main.persistence.repository.UserRepository;
 import main.persistence.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 @Service
-public class UserDAO {
+public class UserDAO{
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     HashMap<String, User> session = new HashMap<>();
 
@@ -27,8 +29,8 @@ public class UserDAO {
         userRepository.save(user);
     }
 
-    public int getCountUserByEmail(String email){
-        return userRepository.countByEmail(email);
+    public User getUserByEmail(String email){
+        return userRepository.findByEmail(email).orElse(null);
     }
 
 }

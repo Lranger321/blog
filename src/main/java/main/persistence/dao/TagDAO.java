@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class TagDAO {
 
     @Autowired
-    TagRepository tagRepository;
+    private TagRepository tagRepository;
 
     public List<Tag> getTags(){
         return (List<Tag>) tagRepository.findAll();

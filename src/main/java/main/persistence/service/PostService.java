@@ -1,5 +1,6 @@
 package main.persistence.service;
 
+import com.google.gson.Gson;
 import main.dto.CalendarInfo;
 import main.dto.PostDtoResponse;
 import main.dto.PostViewResponse;
@@ -20,35 +21,30 @@ import java.util.List;
 public class PostService {
 
     @Autowired
-    PostDAO postDAO;
+    private PostDAO postDAO;
 
     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 
     public PostsInfo getPosts(int offset, int limit, String mode) {
-        List<PostDtoResponse> posts = Converter.createPostDtoList(postDAO.getPosts(mode));
-        return getPostInfo(posts, offset, limit);
+        List<PostDtoResponse> posts = Converter.createPostDtoList(postDAO.getPosts(mode,offset,limit));
+        int count = postDAO.getPostCount();
+        return getPostInfo(posts, count);
     }
 
     public PostsInfo getPostByDate(int offset, int limit, String date) {
         List<PostDtoResponse> posts = Converter.createPostDtoList(postDAO.getPostByDate(date));
-        return getPostInfo(posts, offset, limit);
+        return getPostInfo(posts, posts.size());
     }
 
     public PostsInfo getPostByTag(int offset, int limit, String tag) {
         List<PostDtoResponse> posts = Converter.createPostDtoList(postDAO.getPostByTag(tag));
-        return getPostInfo(posts, offset, limit);
+        return getPostInfo(posts,posts.size());
     }
 
-    private PostsInfo getPostInfo(List<PostDtoResponse> posts, int offset, int limit) {
+    private PostsInfo getPostInfo(List<PostDtoResponse> posts, int count) {
         PostsInfo postsInfo = new PostsInfo();
-        int count = posts.size();
         postsInfo.setCount(count);
-        if (offset + limit < count) {
-            postsInfo.setPosts(posts.subList(offset, offset + limit));
-        } else {
-            postsInfo.setPosts(posts.subList(offset, count));
-        }
         postsInfo.setPosts(posts);
         return postsInfo;
     }
@@ -60,7 +56,7 @@ public class PostService {
         List<Integer> years = new ArrayList<>();
         HashMap<String, Integer> postsCalendar = new HashMap<>();
         String finalInputYear = inputYear;
-        postDAO.getPosts("recent").forEach(post -> {
+        postDAO.getPosts("recent",0,postDAO.getPostCount()).forEach(post -> {
             String date = dateFormat.format(post.getTime());
             int year = Integer.parseInt(date.split("-")[0]);
             if (!years.contains(year)) {
@@ -74,7 +70,9 @@ public class PostService {
     }
 
     public PostsInfo searchPosts(int offset, int limit, String query) {
-        return new PostsInfo();
+        List<PostDtoResponse> posts = Converter.createPostDtoList(postDAO.searchPosts(offset, limit, query));
+        int count =postDAO.getCountByQuery(query);
+        return getPostInfo(posts,count);
     }
 
     public PostViewResponse getPostById(int id) {

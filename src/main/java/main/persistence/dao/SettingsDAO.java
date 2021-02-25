@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class SettingsDAO {
 
     @Autowired
-    GlobalSettingsRepository repository;
+    private GlobalSettingsRepository repository;
 
     public List<GlobalSetting> getSettings() {
         return (List<GlobalSetting>) repository.findAll();

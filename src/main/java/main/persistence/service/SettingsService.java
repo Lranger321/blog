@@ -1,23 +1,28 @@
 package main.persistence.service;
 
+import main.dto.SettingsResponse;
 import main.persistence.dao.SettingsDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
 
 @Service
 public class SettingsService {
 
     @Autowired
-    SettingsDAO settingsDAO;
+    private SettingsDAO settingsDAO;
 
-    public HashMap<String,Boolean> getSettings(){
-        HashMap<String,Boolean> settings = new HashMap<>();
-        settingsDAO.getSettings().forEach(setting->{
-            settings.put(setting.getName(),setting.getValue());
+    public SettingsResponse getSettings() {
+        SettingsResponse response = new SettingsResponse();
+        settingsDAO.getSettings().forEach(setting -> {
+            if (setting.getCode().equals("STATISTICS_IS_PUBLIC")) {
+                response.setStatisticsIsPublic(setting.getValue());
+            } else if (setting.getCode().equals("MULTIUSER_MODE")) {
+                response.setMultiUserMode(setting.getValue());
+            } else if (setting.getCode().equals("POST_PREMODERATION")) {
+                response.setMultiUserMode(setting.getValue());
+            }
         });
-        return settings;
+        return response;
     }
 
 }

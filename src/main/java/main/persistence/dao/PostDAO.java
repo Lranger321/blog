@@ -5,52 +5,70 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import main.dto.CalendarInfo;
+import main.persistence.entity.ModerationStatus;
 import main.persistence.entity.Post;
 import main.persistence.entity.Tag;
+import main.persistence.repository.PostPageRepository;
 import main.persistence.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PostDAO {
 
     @Autowired
-    PostRepository postRepository;
+    private PostRepository postRepository;
+
+    @Autowired
+    private PostPageRepository postPageRepository;
 
     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-    public List<Post> getPosts(String mode) {
-        return (mode != null) ? getSortedPosts(mode) :
-                getSortedPosts("recent");
+    public List<Post> getPosts(String mode, int offset, int limit) {
+        return (mode != null) ? getSortedPosts(mode, offset, limit) :
+                getSortedPosts("recent", offset, limit);
     }
 
-    private List<Post> getSortedPosts(String mode) {
-        List<Post> posts = null;
+    private List<Post> getSortedPosts(String mode, int offset, int limit) {
+        Pageable pageable = null;
+        List<Post> posts = new ArrayList<>();
+        limit += offset;
+        System.out.println(mode + " " + offset + " " + limit);
         switch (mode) {
             //by  сортировать по дате публикации, выводить сначала новые (если
             // mode не задан, использовать это значение по умолчанию
             case "recent":
-                posts = postRepository.getAllSortedByDateAsc();
+                pageable = PageRequest.of(offset, limit, Sort.by("time").descending());
+                posts.addAll((postPageRepository.findAllByIsActiveAndModerationStatus
+                        (true, ModerationStatus.ACCEPTED, pageable)));
                 break;
             // сортировать по убыванию количества комментариев (посты без комментариев выводить)
             case "popular":
-                posts = postRepository.getAllSortedByComments();
+                pageable = PageRequest.of(offset, limit);
+                posts.addAll((postPageRepository.sortedByComments(pageable)));
                 break;
             //- сортировать по убыванию количества лайков (посты без лайков дизлайков выводить)
+            // Todo не работает
             case "best":
-                posts = postRepository.getAllSortedByLikes();
+                pageable = PageRequest.of(offset, limit);
+                posts.addAll(postPageRepository.sortedByLikes(pageable));
                 break;
             //сортировать по дате публикации, выводить сначала старые
             case "early":
-                posts = postRepository.getAllSortedByDate();
+                pageable = PageRequest.of(offset, limit, Sort.by("time").ascending());
+                posts.addAll((postPageRepository.findAllByIsActiveAndModerationStatus
+                        (true, ModerationStatus.ACCEPTED, pageable)));
                 break;
         }
+        //  System.out.println("posts: " + new Gson().toJson(posts, List.class));
         return posts;
     }
 
     public List<Post> getPostByDate(String date) {
-        List<Post> posts = getSortedPosts("recent");
+        List<Post> posts = getSortedPosts("recent", 0, getPostCount());
         posts.removeIf(post -> {
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(post.getTime().getTime());
@@ -61,21 +79,36 @@ public class PostDAO {
     }
 
     public List<Post> getPostByTag(String tag) {
-        return postRepository.findAll().stream()
-                .filter(post -> {
-                    boolean containsTag = false;
-                    for (Tag postTag : post.getTagList()) {
-                        if (postTag.getName().equals(tag)) {
-                            containsTag = true;
-                            break;
-                        }
-                    }
-                    return containsTag;
-                }).collect(Collectors.toList());
+        List<Post> list = postRepository.findAll();
+        return list.stream().filter(post -> {
+            boolean containsTag = false;
+            for (Tag postTag : post.getTagList()) {
+                if (postTag.getName().equals(tag)) {
+                    containsTag = true;
+                    break;
+                }
+            }
+            return containsTag;
+        }).collect(Collectors.toList());
     }
 
-    public Post getPostById(int id){
-        return postRepository.getOne(id);
+    public List<Post> searchPosts(int offset, int limit, String text) {
+        Pageable pageable = PageRequest.of(offset, limit + offset);
+        System.out.println("For text:"+text);
+        postPageRepository.searchByText(pageable, text).forEach(System.out::println);
+        return postPageRepository.searchByText(pageable, text);
+    }
+
+    public int getCountByQuery(String text) {
+        return (int) postRepository.countByText(text);
+    }
+
+    public Post getPostById(int id) {
+        return postRepository.findById(id);
+    }
+
+    public int getPostCount() {
+        return (int) postRepository.count();
     }
 
 

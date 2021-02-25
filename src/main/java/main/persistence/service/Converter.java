@@ -1,5 +1,6 @@
 package main.persistence.service;
 
+import com.google.gson.Gson;
 import main.dto.*;
 import main.persistence.entity.Comment;
 import main.persistence.entity.Post;
@@ -15,6 +16,7 @@ public class Converter {
 
     public static List<PostDtoResponse> createPostDtoList(List<Post> posts) {
         List<PostDtoResponse> responseList = new ArrayList<>();
+
         posts.forEach(post -> {
             UserDtoResponse user = new UserDtoResponse();
             user.setId(post.getUser().getId());
@@ -27,6 +29,7 @@ public class Converter {
                     likeCount, disLikeCount,
                     post.getComments().size(), post.getViewCount());
             responseList.add(postInfo);
+            System.out.println("Post dto:"+ new Gson().toJson(postInfo,PostDtoResponse.class));
         });
         return responseList;
     }
@@ -40,6 +43,11 @@ public class Converter {
     public static AuthResponse createAuthResponse(Boolean status, User user) {
         AuthResponse authResponse = new AuthResponse();
         authResponse.setResult(status);
+        UserDtoResponse userDtoResponse = new UserDtoResponse();
+        userDtoResponse.setId(user.getId());
+        userDtoResponse.setEmail(user.getEmail());
+        userDtoResponse.setModeration(user.isModerator());
+        userDtoResponse.setId(user.getId());
         return authResponse;
     }
 

@@ -1,7 +1,7 @@
 package main.controller;
 
-
 import main.dto.CalendarInfo;
+import main.dto.SettingsResponse;
 import main.dto.TagStorage;
 import main.persistence.service.PostService;
 import main.dto.InitStorage;
@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-
 @RestController
 @RequestMapping("/api")
 public class ApiGeneralController {
@@ -21,13 +19,13 @@ public class ApiGeneralController {
     private final InitStorage initStorage;
 
     @Autowired
-    SettingsService settingsService;
+    private SettingsService settingsService;
 
     @Autowired
-    PostService postService;
+    private PostService postService;
 
     @Autowired
-    TagService tagService;
+    private TagService tagService;
 
     public ApiGeneralController(InitStorage initStorage) {
         this.initStorage = initStorage;
@@ -39,7 +37,7 @@ public class ApiGeneralController {
     }
 
     @GetMapping("/settings")
-    public HashMap<String, Boolean> getSettings() {
+    public SettingsResponse getSettings() {
         return settingsService.getSettings();
     }
 
