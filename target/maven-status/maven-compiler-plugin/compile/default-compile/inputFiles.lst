@@ -1,31 +1,50 @@
-D:\blog\src\main\java\main\dto\PostsInfo.java
-D:\blog\src\main\java\main\dto\TagStorage.java
-D:\blog\src\main\java\main\persistence\entity\Post.java
-D:\blog\src\main\java\main\persistence\entity\Tag.java
-D:\blog\src\main\java\main\persistence\service\SettingsDAO.java
-D:\blog\src\main\java\main\dto\UserDtoResponse.java
-D:\blog\src\main\java\main\persistence\repository\TagRepository.java
-D:\blog\src\main\java\main\persistence\entity\Vote.java
-D:\blog\src\main\java\main\controller\ApiAuthController.java
-D:\blog\src\main\java\main\controller\DefaultController.java
-D:\blog\src\main\java\main\persistence\entity\Comment.java
-D:\blog\src\main\java\main\persistence\service\PostDAO.java
-D:\blog\src\main\java\main\persistence\entity\GlobalSetting.java
-D:\blog\src\main\java\main\persistence\entity\CaptchaCode.java
-D:\blog\src\main\java\main\persistence\entity\ModerationStatus.java
-D:\blog\src\main\java\main\dto\AuthResponse.java
-D:\blog\src\main\java\main\dto\InitStorage.java
-D:\blog\src\main\java\main\persistence\repository\PostForRequestRepository.java
-D:\blog\src\main\java\main\Main.java
-D:\blog\src\main\java\main\persistence\repository\UserRepository.java
-D:\blog\src\main\java\main\persistence\service\TagDAO.java
-D:\blog\src\main\java\main\controller\ApiPostController.java
-D:\blog\src\main\java\main\persistence\repository\GlobalSettingsRepository.java
-D:\blog\src\main\java\main\persistence\entity\PostView.java
-D:\blog\src\main\java\main\controller\ApiGeneralController.java
-D:\blog\src\main\java\main\dto\CalendarInfo.java
-D:\blog\src\main\java\main\persistence\entity\User.java
-D:\blog\src\main\java\main\dto\TagInfo.java
-D:\blog\src\main\java\main\dto\PostDtoResponse.java
-D:\blog\src\main\java\main\persistence\repository\PostRepository.java
-D:\blog\src\main\java\main\persistence\service\UserDAO.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/controller/ApiPostController.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/repository/TagRepository.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/entity/GlobalSetting.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/dto/responce/SettingsResponse.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/dao/SettingsDAO.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/dao/PostDAO.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/dto/responce/TagInfo.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/dto/responce/InitStorage.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/dto/responce/PostDtoResponse.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/controller/DefaultController.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/dto/responce/CaptchaResponse.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/dto/responce/UserDtoResponse.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/security/SecurityUser.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/entity/Comment.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/service/TagService.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/entity/User.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/service/UserService.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/entity/Role.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/dto/responce/AuthResponse.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/security/UserDetailsServiceImpl.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/entity/Post.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/dao/CaptchaDAO.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/controller/ApiGeneralController.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/dto/responce/PostViewResponse.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/dao/TagDAO.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/entity/CaptchaCode.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/controller/ApiAuthController.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/dao/UserDAO.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/service/PostService.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/service/SettingsService.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/entity/Permission.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/dto/responce/TagStorage.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/dto/responce/CalendarInfo.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/repository/UserRepository.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/dto/request/AuthRequest.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/entity/Vote.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/entity/Tag.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/service/Converter.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/dto/responce/RegisterDto.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/repository/GlobalSettingsRepository.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/dto/request/UserRequest.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/config/SecurityConfig.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/dto/responce/CommentInfo.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/repository/CaptchaRepository.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/Main.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/service/CaptchaService.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/repository/PostRepository.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/repository/PostPageRepository.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/persistence/entity/ModerationStatus.java
+/home/lranger/Рабочий стол/blog/src/main/java/main/dto/responce/PostsInfo.java

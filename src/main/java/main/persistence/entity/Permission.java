@@ -2,7 +2,7 @@ package main.persistence.entity;
 
 public enum Permission {
 USER("user:write"),
-    MODERATE("user:write");
+    MODERATE("moder:write");
 
     private final String permission;
 

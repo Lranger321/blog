@@ -6,6 +6,7 @@ import main.persistence.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,12 +59,14 @@ public class ApiPostController {
         return new ResponseEntity(postService.getPostById(id),HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAuthority('moder:write')")
     @GetMapping("/moderation")
     public PostsInfo getPostsForModeration(@PathVariable int offset, @PathVariable int limit,
                                            @PathVariable String status, Principal principal){
         return postService.getPostsForModeration(offset,limit,status,principal.getName());
     }
 
+    @PreAuthorize("hasAuthority('user:write')")
     @GetMapping("/my")
     public PostsInfo getPostByUser(@PathVariable int offset,@PathVariable int limit,
                                    @PathVariable String status, Principal principal){

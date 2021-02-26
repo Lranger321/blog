@@ -82,6 +82,7 @@ public class UserService {
         return registerDto;
     }
 
+    //TODO Name check
     private HashMap<String, String> registerErrors(String email, String password, String name, String captcha,
                                                    String captchaSecret) {
         HashMap<String, String> errors = new HashMap<>();
