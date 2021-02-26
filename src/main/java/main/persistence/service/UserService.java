@@ -1,19 +1,14 @@
 package main.persistence.service;
 
-import main.dto.AuthRequest;
-import main.dto.AuthResponse;
-import main.dto.RegisterDto;
-import main.dto.UserRequest;
+import main.dto.request.AuthRequest;
+import main.dto.responce.*;
 import main.persistence.dao.CaptchaDAO;
 import main.persistence.dao.UserDAO;
 import main.persistence.entity.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,17 +19,22 @@ import java.util.HashMap;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserDAO userDAO;
+    private final UserDAO userDAO;
 
-    @Autowired
-    private CaptchaDAO captchaDAO;
+    private final CaptchaDAO captchaDAO;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+
+    public UserService(UserDAO userDAO, CaptchaDAO captchaDAO,
+                       AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
+        this.userDAO = userDAO;
+        this.captchaDAO = captchaDAO;
+        this.authenticationManager = authenticationManager;
+        this.passwordEncoder = passwordEncoder;
+    }
+
 
     public AuthResponse checkAuth(Principal principal) {
         AuthResponse authResponse;

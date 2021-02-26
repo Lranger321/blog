@@ -1,12 +1,11 @@
 package main.persistence.service;
 
-import main.dto.TagInfo;
-import main.dto.TagStorage;
+import main.dto.responce.*;
+import main.dto.responce.TagStorage;
 import main.persistence.dao.PostDAO;
 import main.persistence.dao.TagDAO;
 import main.persistence.entity.Post;
 import main.persistence.entity.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -15,11 +14,15 @@ import java.util.List;
 @Service
 public class TagService {
 
-    @Autowired
-    private TagDAO tagDAO;
+    private final TagDAO tagDAO;
 
-    @Autowired
-    private PostDAO postDAO;
+    private final PostDAO postDAO;
+
+    public TagService(TagDAO tagDAO, PostDAO postDAO) {
+        this.tagDAO = tagDAO;
+        this.postDAO = postDAO;
+    }
+
 
     public TagStorage countAllWeight() {
         TagStorage tagStorage = new TagStorage();

@@ -1,7 +1,7 @@
 package main.controller;
 
-import main.dto.PostViewResponse;
-import main.dto.PostsInfo;
+import main.dto.responce.PostViewResponse;
+import main.dto.responce.PostsInfo;
 import main.persistence.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,8 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/post")
 public class ApiPostController {
 
+    private final PostService postService;
+
     @Autowired
-    private PostService postService;
+    public ApiPostController(PostService postService) {
+        this.postService = postService;
+    }
+
 
     @GetMapping("")
     public PostsInfo getPosts(int limit, int offset, String mode){

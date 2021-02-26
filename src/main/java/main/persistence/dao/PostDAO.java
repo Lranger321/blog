@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import main.persistence.entity.ModerationStatus;
 import main.persistence.entity.Post;
 import main.persistence.entity.Tag;
-import main.persistence.entity.User;
 import main.persistence.repository.PostPageRepository;
 import main.persistence.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +19,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class PostDAO {
 
-    @Autowired
-    private PostRepository postRepository;
+    private final PostRepository postRepository;
 
-    @Autowired
-    private PostPageRepository postPageRepository;
+    private final PostPageRepository postPageRepository;
 
     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+    @Autowired
+    public PostDAO(PostRepository postRepository, PostPageRepository postPageRepository) {
+        this.postRepository = postRepository;
+        this.postPageRepository = postPageRepository;
+    }
 
     public List<Post> getPosts(String mode, int offset, int limit) {
         return (mode != null) ? getSortedPosts(mode, offset, limit) :

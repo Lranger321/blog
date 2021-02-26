@@ -1,22 +1,22 @@
 package main.persistence.service;
 
 import com.github.cage.GCage;
-import main.dto.CaptchaResponse;
+import main.dto.responce.CaptchaResponse;
 import main.persistence.dao.CaptchaDAO;
 import main.persistence.entity.CaptchaCode;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
 
 @Service
 public class CaptchaService {
 
-    @Autowired
-    private CaptchaDAO captchaDAO;
+    private final CaptchaDAO captchaDAO;
+
+    public CaptchaService(CaptchaDAO captchaDAO) {
+        this.captchaDAO = captchaDAO;
+    }
 
     public CaptchaResponse createCaptcha() {
         CaptchaResponse captchaResponse = new CaptchaResponse();

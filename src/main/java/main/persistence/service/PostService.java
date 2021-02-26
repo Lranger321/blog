@@ -1,9 +1,7 @@
 package main.persistence.service;
 
-import main.dto.CalendarInfo;
-import main.dto.PostDtoResponse;
-import main.dto.PostViewResponse;
-import main.dto.PostsInfo;
+import main.dto.responce.*;
+import main.dto.responce.PostsInfo;
 import main.persistence.dao.PostDAO;
 import main.persistence.dao.UserDAO;
 import main.persistence.entity.ModerationStatus;
@@ -21,13 +19,14 @@ import java.util.List;
 @Service
 public class PostService {
 
-    @Autowired
-    private PostDAO postDAO;
-
-    @Autowired
-    private UserDAO userDAO;
-
     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+    private final PostDAO postDAO;
+
+    @Autowired
+    public PostService(PostDAO postDAO) {
+        this.postDAO = postDAO;
+    }
 
 
     public PostsInfo getPosts(int offset, int limit, String mode) {

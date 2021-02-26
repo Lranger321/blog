@@ -1,7 +1,7 @@
 package main.persistence.service;
 
 import com.google.gson.Gson;
-import main.dto.*;
+import main.dto.responce.*;
 import main.persistence.entity.Comment;
 import main.persistence.entity.Post;
 import main.persistence.entity.User;
@@ -95,10 +95,11 @@ public class Converter {
             user.setName(comment.getUser().getName());
             user.setId(comment.getUser().getId());
             user.setPhoto(comment.getUser().getPhoto());
-            CommentInfo commentInfo = new CommentInfo(comment.getId(),
+           CommentInfo commentInfo = new CommentInfo(comment.getId(),
                     comment.getTime().getTime() / 1000,
                     comment.getText(), user);
             commentInfos.add(commentInfo);
+           commentInfos.add(commentInfo);
         });
         return commentInfos;
     }

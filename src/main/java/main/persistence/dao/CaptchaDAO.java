@@ -8,8 +8,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class CaptchaDAO {
 
+    private final CaptchaRepository captchaRepository;
+
     @Autowired
-    private CaptchaRepository captchaRepository;
+    public CaptchaDAO(CaptchaRepository captchaRepository) {
+        this.captchaRepository = captchaRepository;
+    }
 
     public void saveCaptcha(CaptchaCode captchaCode){
         captchaRepository.save(captchaCode);

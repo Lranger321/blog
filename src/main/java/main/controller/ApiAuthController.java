@@ -1,29 +1,32 @@
 package main.controller;
 
-import main.dto.*;
+import main.dto.request.AuthRequest;
+import main.dto.request.UserRequest;
+import main.dto.responce.AuthResponse;
+import main.dto.responce.CaptchaResponse;
+import main.dto.responce.RegisterDto;
 import main.persistence.service.CaptchaService;
 import main.persistence.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/auth")
 public class ApiAuthController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    private final CaptchaService captchaService;
 
     @Autowired
-    private CaptchaService captchaService;
+    public ApiAuthController(UserService userService, CaptchaService captchaService) {
+        this.userService = userService;
+        this.captchaService = captchaService;
+    }
+
 
     @GetMapping("/check")
     public ResponseEntity<AuthResponse> authCheck(Principal principal){

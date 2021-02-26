@@ -1,6 +1,6 @@
 package main.persistence.service;
 
-import main.dto.SettingsResponse;
+import main.dto.responce.SettingsResponse;
 import main.persistence.dao.SettingsDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,8 +8,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class SettingsService {
 
+    private final SettingsDAO settingsDAO;
+
     @Autowired
-    private SettingsDAO settingsDAO;
+    public SettingsService(SettingsDAO settingsDAO) {
+        this.settingsDAO = settingsDAO;
+    }
 
     public SettingsResponse getSettings() {
         SettingsResponse response = new SettingsResponse();
