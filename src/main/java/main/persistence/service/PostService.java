@@ -104,4 +104,25 @@ public class PostService {
     }
 
 
+
+    public PostsInfo getPostByUser(int offset, int limit, String status, String name) {
+        List<Post> posts = new ArrayList<>();
+        int count = 0;
+        switch (status){
+            case "inactive":
+                posts = postDAO.getInactivePostByUser(offset,limit,name);
+                break;
+            case "pending":
+                posts = postDAO.getPostByUserAndModerationStatus(offset,limit,name,ModerationStatus.NEW);
+                break;
+            case "declined":
+                posts = postDAO.getPostByUserAndModerationStatus(offset,limit,name,ModerationStatus.DECLINED);
+                break;
+            case "published":
+                posts = postDAO.getPostByUserAndModerationStatus(offset,limit,name,ModerationStatus.ACCEPTED);
+                break;
+        }
+        List<PostDtoResponse> list = Converter.createPostDtoList(posts);
+        return Converter.convertToPostsInfo(list,count);
+    }
 }

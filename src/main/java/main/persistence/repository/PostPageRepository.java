@@ -33,8 +33,10 @@ public interface PostPageRepository extends PagingAndSortingRepository<Post, Int
                                     @Param("moderation_status") ModerationStatus moderationStatus,
                                     @Param("moderator_email") String email);
 
-    @Query("FROM Post p where p.user.email = :email")
-    List<Post> findByUserId(Pageable pageable,@Param("email") String email);
+    @Query("FROM Post p where p.user.email = :email AND p.isActive = false")
+    List<Post> findInactivePostByUserId(Pageable pageable,@Param("email") String email);
 
-
+    @Query("FROM Post p WHERE p.user.email = :email AND p.isActive=true AND p.moderationStatus=:moderation_status")
+    List<Post> findPostsByUserId(Pageable pageable,@Param("email")String email,
+                                 @Param("moderation_status") ModerationStatus moderationStatus);
 }

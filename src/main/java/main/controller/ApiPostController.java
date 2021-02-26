@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("/api/post")
 public class ApiPostController {
@@ -47,13 +49,25 @@ public class ApiPostController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity getPostById(@PathVariable int id){
+    public ResponseEntity<PostViewResponse> getPostById(@PathVariable int id){
         System.out.println("POST ID:"+id);
         PostViewResponse postViewResponse = postService.getPostById(id);
         if(postViewResponse == null){
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity(postService.getPostById(id),HttpStatus.OK);
+    }
+
+    @GetMapping("/moderation")
+    public PostsInfo getPostsForModeration(@PathVariable int offset, @PathVariable int limit,
+                                           @PathVariable String status, Principal principal){
+        return postService.getPostsForModeration(offset,limit,status,principal.getName());
+    }
+
+    @GetMapping("/my")
+    public PostsInfo getPostByUser(@PathVariable int offset,@PathVariable int limit,
+                                   @PathVariable String status, Principal principal){
+        return postService.getPostByUser(offset,limit,status,principal.getName());
     }
 
 }

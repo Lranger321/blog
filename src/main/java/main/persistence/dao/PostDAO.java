@@ -113,9 +113,14 @@ public class PostDAO {
         return (int) postRepository.count();
     }
 
-    public List<Post> getPostByUserId(int offset,int limit,String email){
+    public List<Post> getInactivePostByUser(int offset,int limit,String email){
         Pageable pageable = PageRequest.of(offset,offset+limit);
-        return postPageRepository.findByUserId(pageable,email);
+        return postPageRepository.findInactivePostByUserId(pageable,email);
+    }
+
+    public List<Post> getPostByUserAndModerationStatus(int offset,int limit,String email,ModerationStatus status){
+        Pageable pageable = PageRequest.of(offset,offset+limit);
+        return postPageRepository.findPostsByUserId(pageable,email,status);
     }
 
     public List<Post> getNewPostsForModeration(int offset,int limit){
