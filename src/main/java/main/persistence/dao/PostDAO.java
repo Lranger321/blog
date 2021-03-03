@@ -40,7 +40,6 @@ public class PostDAO {
         Pageable pageable = null;
         List<Post> posts = new ArrayList<>();
         limit += offset;
-        System.out.println(mode + " " + offset + " " + limit);
         switch (mode) {
             //by  сортировать по дате публикации, выводить сначала новые (если
             // mode не задан, использовать это значение по умолчанию
@@ -67,7 +66,6 @@ public class PostDAO {
                         (true, ModerationStatus.ACCEPTED, pageable)));
                 break;
         }
-        //  System.out.println("posts: " + new Gson().toJson(posts, List.class));
         return posts;
     }
 
@@ -113,28 +111,33 @@ public class PostDAO {
         return (int) postRepository.count();
     }
 
-    public List<Post> getInactivePostByUser(int offset,int limit,String email){
-        Pageable pageable = PageRequest.of(offset,offset+limit);
-        return postPageRepository.findInactivePostByUserId(pageable,email);
+    public List<Post> getInactivePostByUser(int offset, int limit, String email) {
+        Pageable pageable = PageRequest.of(offset, offset + limit);
+        return postPageRepository.findInactivePostByUserId(pageable, email);
     }
 
-    public List<Post> getPostByUserAndModerationStatus(int offset,int limit,String email,ModerationStatus status){
-        Pageable pageable = PageRequest.of(offset,offset+limit);
-        return postPageRepository.findPostsByUserId(pageable,email,status);
+    public List<Post> getPostByUserAndModerationStatus(int offset, int limit, String email, ModerationStatus status) {
+        Pageable pageable = PageRequest.of(offset, offset + limit);
+        return postPageRepository.findPostsByUserId(pageable, email, status);
     }
 
-    public List<Post> getNewPostsForModeration(int offset,int limit){
-        Pageable pageable = PageRequest.of(offset,offset+limit);
+    public List<Post> getNewPostsForModeration(int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset, offset + limit);
         return postPageRepository.findAllNewForModeration(pageable);
     }
 
-    public List<Post> getPostForModeration(int offset,int limit,ModerationStatus moderationStatus,String email){
-        Pageable pageable = PageRequest.of(offset,limit);
-        return postPageRepository.findAllForModeration(pageable,moderationStatus,email);
+    public List<Post> getPostForModeration(int offset, int limit, ModerationStatus moderationStatus, String email) {
+        Pageable pageable = PageRequest.of(offset, limit);
+        return postPageRepository.findAllForModeration(pageable, moderationStatus, email);
     }
 
+    public int getCountForModeration(){
+        return (int) postRepository.countOfModeration();
+    }
 
-
+    public int getCountForModerationByStatusAndUser(ModerationStatus status, String name) {
+        return (int) postRepository.countOfPostByUserAndModerationStatus(status,name);
+    }
 }
 
 

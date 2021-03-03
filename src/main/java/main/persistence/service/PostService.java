@@ -88,15 +88,15 @@ public class PostService {
             switch (status) {
                 case "new":
                     posts = postDAO.getNewPostsForModeration(offset, limit);
-                    count = 0;
+                    count = postDAO.getCountForModeration();
                     break;
                 case "declined":
                     posts = postDAO.getPostForModeration(offset,limit, ModerationStatus.DECLINED,userName);
-                    count = 0;
+                    count = postDAO.getCountForModerationByStatusAndUser(ModerationStatus.DECLINED,userName);
                     break;
                 case "accepted":
                     posts = postDAO.getPostForModeration(offset,limit,ModerationStatus.ACCEPTED,userName);
-                    count = 0;
+                    count = postDAO.getCountForModerationByStatusAndUser(ModerationStatus.ACCEPTED,userName);
                     break;
             }
             List<PostDtoResponse> postDtoResponseList = Converter.createPostDtoList(posts);
@@ -125,4 +125,5 @@ public class PostService {
         List<PostDtoResponse> list = Converter.createPostDtoList(posts);
         return Converter.convertToPostsInfo(list,count);
     }
+
 }

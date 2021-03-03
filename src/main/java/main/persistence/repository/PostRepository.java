@@ -15,31 +15,16 @@ import java.util.List;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Integer> {
 
-   /* @Query(value = "SELECT Post FROM Post WHERE Post.moderationStatus = 'ACCEPTED' AND Post.isActive = true ")
-    List<Post> getAllActiveAndAccepted();
-
-    @Query(value = "SELECT Post FROM Post WHERE  Post.moderationStatus = 'ACCEPTED'  AND Post.isActive = true" +
-            " ORDER BY time ASC ")
-    List<Post> getAllSortedByDate(Pageable pageable);
-
-    @Query(value = "SELECT *,(SELECT COUNT(*) FROM posts_votes WHERE value = -1 AND post.id = post_id) as like_count " +
-            "FROM posts as post WHERE moderation_status = 'ACCEPTED' AND is_active = 1 ORDER BY like_count DESC "
-            ,nativeQuery = true)
-    List<Post> getAllSortedByLikes();
-
-    @Query(value = "SELECT *,(SELECT COUNT(*) FROM post_comments WHERE  post.id = post_id) as comment_count " +
-            "FROM posts as post WHERE moderation_status = 'ACCEPTED' AND is_active = 1 ORDER BY comment_count DESC "
-            ,nativeQuery = true)
-    List<Post> getAllSortedByComments();
-
-    @Query(value = "SELECT * FROM posts WHERE moderation_status = 'ACCEPTED' AND is_active = 1 ORDER BY time DESC "
-            ,nativeQuery = true)
-    List<Post> getAllSortedByDateAsc();*/
-
     Post findById(int id);
 
     @Query("SELECT count(p) FROM Post p where p.text like concat('%',:search_text,'%')")
     long countByText(@Param("search_text") String Text);
 
-    
+    @Query("SELECT count(p) FROM Post p where p.moderationStatus='NEW' AND p.isActive=true")
+    long countOfModeration();
+
+    @Query("SELECT count(p) FROM Post p WHERE p.user.email = :email AND p.isActive=true " +
+            "AND p.moderationStatus=:moderation_status")
+    long countOfPostByUserAndModerationStatus(@Param("moderation_status") ModerationStatus status,
+                                              @Param("email") String name);
 }

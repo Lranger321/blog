@@ -29,7 +29,6 @@ public class Converter {
                     likeCount, disLikeCount,
                     post.getComments().size(), post.getViewCount());
             responseList.add(postInfo);
-            System.out.println("Post dto:"+ new Gson().toJson(postInfo,PostDtoResponse.class));
         });
         return responseList;
     }
@@ -47,14 +46,19 @@ public class Converter {
         return authResponse;
     }
 
-    public static AuthResponse createAuthResponse(Boolean status, User user) {
+    public static AuthResponse createAuthResponse(Boolean status, User user,int moderationCount) {
         AuthResponse authResponse = new AuthResponse();
         authResponse.setResult(status);
         UserDtoResponse userDtoResponse = new UserDtoResponse();
         userDtoResponse.setId(user.getId());
+        userDtoResponse.setName(user.getName());
+        userDtoResponse.setModerationCount(moderationCount);
         userDtoResponse.setEmail(user.getEmail());
         userDtoResponse.setModeration(user.isModerator());
         userDtoResponse.setId(user.getId());
+        userDtoResponse.setSettings(true);
+        authResponse.setUser(userDtoResponse);
+        System.out.println(new Gson().toJson(authResponse,AuthResponse.class));
         return authResponse;
     }
 

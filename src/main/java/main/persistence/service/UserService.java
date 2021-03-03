@@ -3,6 +3,7 @@ package main.persistence.service;
 import main.dto.request.AuthRequest;
 import main.dto.responce.*;
 import main.persistence.dao.CaptchaDAO;
+import main.persistence.dao.PostDAO;
 import main.persistence.dao.UserDAO;
 import main.persistence.entity.User;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,9 +13,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpSession;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -27,35 +31,46 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final PostDAO postDAO;
+
+    private final List<String> sessions = new ArrayList<>();
+
     public UserService(UserDAO userDAO, CaptchaDAO captchaDAO,
-                       AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
+                       AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, PostDAO postDAO) {
         this.userDAO = userDAO;
         this.captchaDAO = captchaDAO;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
+        this.postDAO = postDAO;
     }
 
 
-    public AuthResponse checkAuth(Principal principal) {
+    public AuthResponse checkAuth(Principal principal, HttpSession session) {
         AuthResponse authResponse;
-        if(principal == null){
-           authResponse = Converter.createAuthResponse(false);
+        if(principal != null && sessions.contains(session.getId())){
+            User user = userDAO.getUserByEmail(principal.getName());
+            int moderationCount = (user.isModerator())? postDAO.getCountForModeration() : 0;
+            authResponse =  Converter.createAuthResponse(true,user,moderationCount);
         }else{
-          authResponse =  Converter.createAuthResponse(true,userDAO.getUserByEmail(principal.getName()));
+            authResponse = Converter.createAuthResponse(false);
         }
         return authResponse;
     }
 
-    public AuthResponse login(AuthRequest request){
+    public AuthResponse login(AuthRequest request, HttpSession session){
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(),request.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(auth);
-        org.springframework.security.core.userdetails.User user =
-                (org.springframework.security.core.userdetails.User) auth.getPrincipal();
         User userInDB = userDAO.getUserByEmail(request.getEmail());
-        return Converter.createAuthResponse(true,userInDB);
+        sessions.add(session.getId());
+        int moderationCount = (userInDB.isModerator())? postDAO.getCountForModeration() : 0;
+        return Converter.createAuthResponse(true,userInDB,moderationCount);
     }
 
+    public AuthResponse logout(HttpSession session){
+        sessions.remove(session.getId());
+        return Converter.createAuthResponse(true);
+    }
 
     public RegisterDto userRegister(String email, String password, String name, String captcha, String captchaSecret) {
         System.out.println(captchaSecret);

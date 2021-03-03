@@ -39,19 +39,16 @@ public class ApiPostController {
 
     @GetMapping("/byTag")
     public PostsInfo getPostByTag(int offset,int limit,String tag){
-        System.out.println(tag);
         return postService.getPostByTag(offset,limit,tag);
     }
 
     @GetMapping("/search")
     public PostsInfo searchPosts(int offset, int limit, String query) {
-        System.out.println(offset+" "+limit+" "+query);
         return postService.searchPosts(offset, limit, query);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PostViewResponse> getPostById(@PathVariable int id){
-        System.out.println("POST ID:"+id);
         PostViewResponse postViewResponse = postService.getPostById(id);
         if(postViewResponse == null){
             return new ResponseEntity(HttpStatus.NOT_FOUND);
@@ -61,15 +58,13 @@ public class ApiPostController {
 
     @PreAuthorize("hasAuthority('moder:write')")
     @GetMapping("/moderation")
-    public PostsInfo getPostsForModeration(@PathVariable int offset, @PathVariable int limit,
-                                           @PathVariable String status, Principal principal){
+    public PostsInfo getPostsForModeration(int offset,int limit, String status, Principal principal){
         return postService.getPostsForModeration(offset,limit,status,principal.getName());
     }
 
     @PreAuthorize("hasAuthority('user:write')")
     @GetMapping("/my")
-    public PostsInfo getPostByUser(@PathVariable int offset,@PathVariable int limit,
-                                   @PathVariable String status, Principal principal){
+    public PostsInfo getPostByUser(int offset,int limit, String status, Principal principal){
         return postService.getPostByUser(offset,limit,status,principal.getName());
     }
 

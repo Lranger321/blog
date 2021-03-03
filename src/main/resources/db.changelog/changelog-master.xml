@@ -30,7 +30,7 @@
             <column name="code" type="varchar(255)"/>
             <column name="photo" type="text"/>
         </createTable>
-        <createTable tableName="posts">
+        <createTable tableName="posts" >
             <column name="id" type="int" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -144,7 +144,7 @@
             </column>
         </createTable>
     </changeSet>
-    <!--
+
         <changeSet id="input" author="root" runOnChange="true">
             <insert tableName="global_settings">
                 <column name="code" value="MULTIUSER_MODE"/>
@@ -264,5 +264,31 @@
                 <column name="tag_id" value="3"/>
             </insert>
         </changeSet>
-    -->
+
+    <changeSet id="moderator id null" author="root">
+        <sql>ALTER TABLE posts MODIFY moderator_id VARCHAR(255)</sql>
+    </changeSet>
+
+    <changeSet id="postForModeration" author="root" runOnChange="true">
+        <insert tableName="posts">
+            <column name="is_active" value="0"/>
+            <column name="moderation_status" value="NEW"/>
+            <column name="user_id" value="6"/>
+            <column name="time" value="${now}"/>
+            <column name="title" value="Название"/>
+            <column name="text" value="Здесь текст"/>
+            <column name="view_count" value="0"/>
+        </insert>
+        <insert tableName="posts">
+            <column name="is_active" value="1"/>
+            <column name="moderation_status" value="DECLINED"/>
+            <column name="moderator_id" value="7"/>
+            <column name="user_id" value="6"/>
+            <column name="time" value="${now}"/>
+            <column name="title" value="Declined Post"/>
+            <column name="text" value="Здесь текст"/>
+            <column name="view_count" value="0"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>
