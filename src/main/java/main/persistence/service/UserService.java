@@ -33,8 +33,6 @@ public class UserService {
 
     private final PostDAO postDAO;
 
-    private final List<String> sessions = new ArrayList<>();
-
     public UserService(UserDAO userDAO, CaptchaDAO captchaDAO,
                        AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, PostDAO postDAO) {
         this.userDAO = userDAO;
@@ -45,34 +43,29 @@ public class UserService {
     }
 
 
-    public AuthResponse checkAuth(Principal principal, HttpSession session) {
+    public AuthResponse checkAuth(Principal principal) {
         AuthResponse authResponse;
-        if(principal != null && sessions.contains(session.getId())){
+        if (principal != null) {
             User user = userDAO.getUserByEmail(principal.getName());
-            int moderationCount = (user.isModerator())? postDAO.getCountForModeration() : 0;
-            authResponse =  Converter.createAuthResponse(true,user,moderationCount);
-        }else{
+            int moderationCount = (user.isModerator()) ? postDAO.getCountForModeration() : 0;
+            authResponse = Converter.createAuthResponse(true, user, moderationCount);
+        } else {
             authResponse = Converter.createAuthResponse(false);
         }
         return authResponse;
     }
 
-    public AuthResponse login(AuthRequest request, HttpSession session){
+    public AuthResponse login(AuthRequest request) {
         Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(),request.getPassword()));
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(auth);
         User userInDB = userDAO.getUserByEmail(request.getEmail());
-        sessions.add(session.getId());
-        int moderationCount = (userInDB.isModerator())? postDAO.getCountForModeration() : 0;
-        return Converter.createAuthResponse(true,userInDB,moderationCount);
+        int moderationCount = (userInDB.isModerator()) ? postDAO.getCountForModeration() : 0;
+        return Converter.createAuthResponse(true, userInDB, moderationCount);
     }
 
-    public AuthResponse logout(HttpSession session){
-        sessions.remove(session.getId());
-        return Converter.createAuthResponse(true);
-    }
-
-    public RegisterDto userRegister(String email, String password, String name, String captcha, String captchaSecret) {
+    public RegisterDto userRegister(String email, String password, String name, String captcha,
+                                    String captchaSecret) {
         System.out.println(captchaSecret);
         HashMap<String, String> errors = registerErrors(email, password, name, captcha, captchaSecret);
         System.out.println(captcha);

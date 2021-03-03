@@ -30,8 +30,8 @@ public class ApiAuthController {
 
 
     @GetMapping("/check")
-    public ResponseEntity<AuthResponse> authCheck(HttpSession session,Principal principal){
-        return ResponseEntity.ok(userService.checkAuth(principal,session));
+    public ResponseEntity<AuthResponse> authCheck(Principal principal){
+        return ResponseEntity.ok(userService.checkAuth(principal));
     }
 
     @GetMapping("/captcha")
@@ -40,18 +40,10 @@ public class ApiAuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request,HttpSession session){
-       AuthResponse authResponse = userService.login(request,session);
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request){
+       AuthResponse authResponse = userService.login(request);
         return ResponseEntity.ok(authResponse);
     }
-
-    @GetMapping("/logout")
-    public ResponseEntity<AuthResponse> logout(HttpSession session){
-        AuthResponse authResponse = userService.logout(session);
-        return ResponseEntity.ok(authResponse);
-    }
-
-
 
     @PostMapping(value = "/register",produces = "application/json")
     public RegisterDto userRegister(@RequestBody UserRequest user){
