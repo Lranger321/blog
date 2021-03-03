@@ -1,6 +1,7 @@
 package main.persistence.service;
 
-import main.dto.*;
+import com.google.gson.Gson;
+import main.dto.responce.*;
 import main.persistence.entity.Comment;
 import main.persistence.entity.Post;
 import main.persistence.entity.User;
@@ -15,6 +16,7 @@ public class Converter {
 
     public static List<PostDtoResponse> createPostDtoList(List<Post> posts) {
         List<PostDtoResponse> responseList = new ArrayList<>();
+
         posts.forEach(post -> {
             UserDtoResponse user = new UserDtoResponse();
             user.setId(post.getUser().getId());
@@ -31,15 +33,32 @@ public class Converter {
         return responseList;
     }
 
+    public static PostsInfo convertToPostsInfo(List<PostDtoResponse> posts, int count) {
+        PostsInfo postsInfo = new PostsInfo();
+        postsInfo.setCount(count);
+        postsInfo.setPosts(posts);
+        return postsInfo;
+    }
+
     public static AuthResponse createAuthResponse(Boolean status) {
         AuthResponse authResponse = new AuthResponse();
         authResponse.setResult(status);
         return authResponse;
     }
 
-    public static AuthResponse createAuthResponse(Boolean status, User user) {
+    public static AuthResponse createAuthResponse(Boolean status, User user,int moderationCount) {
         AuthResponse authResponse = new AuthResponse();
         authResponse.setResult(status);
+        UserDtoResponse userDtoResponse = new UserDtoResponse();
+        userDtoResponse.setId(user.getId());
+        userDtoResponse.setName(user.getName());
+        userDtoResponse.setModerationCount(moderationCount);
+        userDtoResponse.setEmail(user.getEmail());
+        userDtoResponse.setModeration(user.isModerator());
+        userDtoResponse.setId(user.getId());
+        userDtoResponse.setSettings(true);
+        authResponse.setUser(userDtoResponse);
+        System.out.println(new Gson().toJson(authResponse,AuthResponse.class));
         return authResponse;
     }
 
@@ -80,10 +99,11 @@ public class Converter {
             user.setName(comment.getUser().getName());
             user.setId(comment.getUser().getId());
             user.setPhoto(comment.getUser().getPhoto());
-            CommentInfo commentInfo = new CommentInfo(comment.getId(),
+           CommentInfo commentInfo = new CommentInfo(comment.getId(),
                     comment.getTime().getTime() / 1000,
                     comment.getText(), user);
             commentInfos.add(commentInfo);
+           commentInfos.add(commentInfo);
         });
         return commentInfos;
     }

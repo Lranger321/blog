@@ -30,7 +30,7 @@
             <column name="code" type="varchar(255)"/>
             <column name="photo" type="text"/>
         </createTable>
-        <createTable tableName="posts">
+        <createTable tableName="posts" >
             <column name="id" type="int" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -145,123 +145,149 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="comments" author="root">
-        <insert tableName="post_comments">
-            <column name="post_id" value="3"/>
-            <column name="user_id" value="1"/>
-            <column name="time" value="${now}"/>
-            <column name="text" value="Good post"/>
-        </insert>
-        <insert tableName="post_comments">
-            <column name="post_id" value="3"/>
-            <column name="parent_id" value="1"/>
-            <column name="user_id" value="1"/>
-            <column name="time" value="${now}"/>
-            <column name="text" value="Good post"/>
-        </insert>
+        <changeSet id="input" author="root" runOnChange="true">
+            <insert tableName="global_settings">
+                <column name="code" value="MULTIUSER_MODE"/>
+                <column name="name" value="MULTIUSER_MODE"/>
+                <column name="value" value="false"/>
+            </insert>
+            <insert tableName="global_settings">
+                <column name="code" value="STATISTICS_IS_PUBLIC"/>
+                <column name="name" value="STATISTICS_IS_PUBLIC"/>
+                <column name="value" value="true"/>
+            </insert>
+            <insert tableName="global_settings">
+                <column name="code" value="POST_PREMODERATION"/>
+                <column name="name" value="POST_PREMODERATION"/>
+                <column name="value" value="true"/>
+            </insert>
+            <insert tableName="users">
+                <column name="is_moderator" value="0"/>
+                <column name="reg_time" value="${now}"/>
+                <column name="name" value="root"/>
+                <column name="email" value="nikita30.07@mail.ru"/>
+                <column name="password" value="root"/>
+            </insert>
+            <insert tableName="users">
+                <column name="is_moderator" value="1"/>
+                <column name="reg_time" value="${now}"/>
+                <column name="name" value="admin"/>
+                <column name="email" value="nikita30.07@mail.ru"/>
+                <column name="password" value="admin"/>
+            </insert>
+            <insert tableName="posts">
+                <column name="is_active" value="1"/>
+                <column name="moderation_status" value="ACCEPTED"/>
+                <column name="moderator_id" value="2"/>
+                <column name="user_id" value="1"/>
+                <column name="time" value="${now}"/>
+                <column name="title" value="Название"/>
+                <column name="text" value="Здесь текст"/>
+                <column name="view_count" value="60"/>
+            </insert>
+            <insert tableName="posts">
+                <column name="is_active" value="1"/>
+                <column name="moderation_status" value="ACCEPTED"/>
+                <column name="moderator_id" value="2"/>
+                <column name="user_id" value="1"/>
+                <column name="time" value="${now}"/>
+                <column name="title" value="Название"/>
+                <column name="text" value="Здесь текст"/>
+                <column name="view_count" value="1020"/>
+            </insert>
+        </changeSet>
+
+        <changeSet id="votes" author="root" runOnChange="true">
+            <insert tableName="posts_votes">
+                <column name="user_id" value="1"/>
+                <column name="post_id" value="1"/>
+                <column name="time" value="${now}"/>
+                <column name="value" value="1"/>
+            </insert>
+            <insert tableName="posts_votes">
+                <column name="user_id" value="2"/>
+                <column name="post_id" value="1"/>
+                <column name="time" value="${now}"/>
+                <column name="value" value="1"/>
+            </insert>
+            <insert tableName="posts_votes">
+                <column name="user_id" value="1"/>
+                <column name="post_id" value="1"/>
+                <column name="time" value="${now}"/>
+                <column name="value" value="-1"/>
+            </insert>
+        </changeSet>
+
+        <changeSet id="comments" author="root" runOnChange="true">
+            <insert tableName="post_comments">
+                <column name="post_id" value="3"/>
+                <column name="user_id" value="1"/>
+                <column name="time" value="${now}"/>
+                <column name="text" value="Good post"/>
+            </insert>
+            <insert tableName="post_comments">
+                <column name="post_id" value="3"/>
+                <column name="parent_id" value="1"/>
+                <column name="user_id" value="1"/>
+                <column name="time" value="${now}"/>
+                <column name="text" value="Good post"/>
+            </insert>
+        </changeSet>
+
+        <changeSet id="tags" author="root" runOnChange="true">
+            <insert tableName="tags">
+                <column name="id" value="1"/>
+                <column name="name" value="Java"/>
+            </insert>
+            <insert tableName="tags">
+                <column name="id" value="2"/>
+                <column name="name" value="Spring"/>
+            </insert>
+            <insert tableName="tags">
+                <column name="id" value="3"/>
+                <column name="name" value="Hadoop"/>
+            </insert>
+            <insert tableName="tag2post">
+                <column name="post_id" value="1"/>
+                <column name="tag_id" value="1"/>
+            </insert>
+            <insert tableName="tag2post">
+                <column name="post_id" value="2"/>
+                <column name="tag_id" value="1"/>
+            </insert>
+            <insert tableName="tag2post">
+                <column name="post_id" value="1"/>
+                <column name="tag_id" value="2"/>
+            </insert>
+            <insert tableName="tag2post">
+                <column name="post_id" value="3"/>
+                <column name="tag_id" value="3"/>
+            </insert>
+        </changeSet>
+
+    <changeSet id="moderator id null" author="root">
+        <sql>ALTER TABLE posts MODIFY moderator_id VARCHAR(255)</sql>
     </changeSet>
 
-    <changeSet id="tags" author="root">
-        <insert tableName="tags">
-            <column name="id" value="1"/>
-            <column name="name" value="Java"/>
-        </insert>
-        <insert tableName="tags">
-            <column name="id" value="2"/>
-            <column name="name" value="Spring"/>
-        </insert>
-        <insert tableName="tags">
-            <column name="id" value="3"/>
-            <column name="name" value="Hadoop"/>
-        </insert>
-        <insert tableName="tag2post">
-            <column name="post_id" value="1"/>
-            <column name="tag_id" value="1"/>
-        </insert>
-        <insert tableName="tag2post">
-            <column name="post_id" value="2"/>
-            <column name="tag_id" value="1"/>
-        </insert>
-        <insert tableName="tag2post">
-            <column name="post_id" value="1"/>
-            <column name="tag_id" value="2"/>
-        </insert>
-        <insert tableName="tag2post">
-            <column name="post_id" value="3"/>
-            <column name="tag_id" value="3"/>
-        </insert>
-    </changeSet>
-
-    <changeSet id="input" author="root">
-        <insert tableName="global_settings">
-            <column name="code" value="MULTIUSER_MODE"/>
-            <column name="name" value="MULTIUSER_MODE"/>
-            <column name="value" value="false"/>
-        </insert>
-        <insert tableName="global_settings">
-            <column name="code" value="STATISTICS_IS_PUBLIC"/>
-            <column name="name" value="STATISTICS_IS_PUBLIC"/>
-            <column name="value" value="true"/>
-        </insert>
-        <insert tableName="global_settings">
-            <column name="code" value="POST_PREMODERATION"/>
-            <column name="name" value="POST_PREMODERATION"/>
-            <column name="value" value="true"/>
-        </insert>
-        <insert tableName="users">
-            <column name="is_moderator" value="0"/>
-            <column name="reg_time" value="${now}"/>
-            <column name="name" value="root"/>
-            <column name="email" value="nikita30.07@mail.ru"/>
-            <column name="password" value="root"/>
-        </insert>
-        <insert tableName="users">
-            <column name="is_moderator" value="1"/>
-            <column name="reg_time" value="${now}"/>
-            <column name="name" value="admin"/>
-            <column name="email" value="nikita30.07@mail.ru"/>
-            <column name="password" value="admin"/>
-        </insert>
+    <changeSet id="postForModeration" author="root" runOnChange="true">
         <insert tableName="posts">
-            <column name="is_active" value="1"/>
-            <column name="moderation_status" value="ACCEPTED"/>
-            <column name="moderator_id" value="2"/>
-            <column name="user_id" value="1"/>
+            <column name="is_active" value="0"/>
+            <column name="moderation_status" value="NEW"/>
+            <column name="user_id" value="6"/>
             <column name="time" value="${now}"/>
             <column name="title" value="Название"/>
             <column name="text" value="Здесь текст"/>
-            <column name="view_count" value="60"/>
+            <column name="view_count" value="0"/>
         </insert>
         <insert tableName="posts">
             <column name="is_active" value="1"/>
-            <column name="moderation_status" value="ACCEPTED"/>
-            <column name="moderator_id" value="2"/>
-            <column name="user_id" value="1"/>
+            <column name="moderation_status" value="DECLINED"/>
+            <column name="moderator_id" value="7"/>
+            <column name="user_id" value="6"/>
             <column name="time" value="${now}"/>
-            <column name="title" value="Название"/>
+            <column name="title" value="Declined Post"/>
             <column name="text" value="Здесь текст"/>
-            <column name="view_count" value="1020"/>
-        </insert>
-    </changeSet>
-
-    <changeSet id="votes" author="root">
-        <insert tableName="posts_votes">
-            <column name="user_id" value="1"/>
-            <column name="post_id" value="1"/>
-            <column name="time" value="${now}"/>
-            <column name="value" value="1"/>
-        </insert>
-        <insert tableName="posts_votes">
-            <column name="user_id" value="2"/>
-            <column name="post_id" value="1"/>
-            <column name="time" value="${now}"/>
-            <column name="value" value="1"/>
-        </insert>
-        <insert tableName="posts_votes">
-            <column name="user_id" value="1"/>
-            <column name="post_id" value="1"/>
-            <column name="time" value="${now}"/>
-            <column name="value" value="-1"/>
+            <column name="view_count" value="0"/>
         </insert>
     </changeSet>
 

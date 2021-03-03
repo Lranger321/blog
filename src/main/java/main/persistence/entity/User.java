@@ -33,6 +33,10 @@ public class User {
 
     private String photo;
 
+    public Role getRole(){
+        return isModerator ? Role.MODERATOR : Role.USER;
+    }
+
     public int getId() {
         return id;
     }
