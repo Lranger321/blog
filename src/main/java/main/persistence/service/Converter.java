@@ -25,7 +25,7 @@ public class Converter {
             int disLikeCount = (int) post.getVotes().stream().filter(vote -> !vote.getValue()).count();
             PostDtoResponse postInfo = new PostDtoResponse(post.getId(),
                     post.getTime().getTime() / 1000, user,
-                    post.getTitle(), post.getText(),
+                    post.getTitle(), Jsoup.parse(post.getText()).text(),
                     likeCount, disLikeCount,
                     post.getComments().size(), post.getViewCount());
             responseList.add(postInfo);

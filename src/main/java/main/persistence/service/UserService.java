@@ -87,7 +87,6 @@ public class UserService {
         return registerDto;
     }
 
-    //TODO Name check
     private HashMap<String, String> registerErrors(String email, String password, String name, String captcha,
                                                    String captchaSecret) {
         HashMap<String, String> errors = new HashMap<>();
@@ -100,9 +99,9 @@ public class UserService {
         if (!captchaDAO.getCaptcha(captchaSecret).getCode().equals(captcha)) {
             errors.put("captcha", "Код с картинки введён неверно");
         }
-        /*if(name){
+        if(name.length() < 3){
             errors.put("name","Имя указано неверно");
-        }*/
+        }
         System.out.println(errors.keySet().size());
         return errors;
     }

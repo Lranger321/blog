@@ -7,6 +7,7 @@ import main.persistence.dao.PostDAO;
 import main.persistence.dao.UserDAO;
 import main.persistence.entity.ModerationStatus;
 import main.persistence.entity.Post;
+import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +38,7 @@ public class PostService {
     public PostCreateResponse createPost(PostCreateRequest request,String email){
         HashMap<String,String> errors = getPostCreateErrors(request);
         boolean result = false;
-        if(errors.keySet().size() == 0){
+        if(errors !=null){
             Post post = new Post();
             post.setActive(request.isActive());
             post.setUser(userDAO.getUserByEmail(email));
@@ -52,7 +53,17 @@ public class PostService {
     }
 
     private HashMap<String, String> getPostCreateErrors(PostCreateRequest request) {
-        return null;
+        HashMap<String,String> errors = new HashMap<>();
+        if(request.getTitle() == null){
+            errors.put("title","Заголовок не установлен");
+        }
+        if(Jsoup.parse(request.getText()).text().length() < 20){
+            errors.put("text","Текст публикации слишком короткий");
+        }
+        if(errors.keySet().isEmpty()) {
+            return null;
+        }
+        return errors;
     }
 
 
