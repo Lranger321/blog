@@ -1,7 +1,7 @@
 package main.persistence.service;
 
-import main.dto.responce.*;
-import main.dto.responce.TagStorage;
+import main.dto.response.*;
+import main.dto.response.TagStorage;
 import main.persistence.dao.PostDAO;
 import main.persistence.dao.TagDAO;
 import main.persistence.entity.Post;

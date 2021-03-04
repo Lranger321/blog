@@ -1,32 +1,24 @@
-package main.dto.responce;
+package main.dto.response;
 
+import java.util.List;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import main.dto.responce.UserDtoResponse;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
-public class PostDtoResponse {
+public class PostViewResponse {
 
     private int id;
-
     private long timestamp;
-
     private UserDtoResponse user;
-
     private String title;
-
-    private String announce;
-
+    private String text;
     private int likeCount;
-
     private int dislikeCount;
-
-    private int commentCount;
-
     private int viewCount;
+    private List<CommentInfo> comments;
+    private List<String> tags;
 
 }

@@ -1,14 +1,14 @@
-package main.dto.responce;
+package main.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class TagInfo {
+public class AuthResponse {
 
-    private String name;
+    private boolean result;
 
-    private double weight;
+    private UserDtoResponse user;
 
 }

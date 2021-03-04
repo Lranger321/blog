@@ -1,8 +1,7 @@
-package main.dto.responce;
+package main.dto.response;
 
 import lombok.Data;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 

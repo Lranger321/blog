@@ -1,16 +1,15 @@
 package main.controller;
 
-import main.dto.responce.PostViewResponse;
-import main.dto.responce.PostsInfo;
+import main.dto.request.PostCreateRequest;
+import main.dto.response.PostCreateResponse;
+import main.dto.response.PostViewResponse;
+import main.dto.response.PostsInfo;
 import main.persistence.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
@@ -55,6 +54,16 @@ public class ApiPostController {
         }
         return new ResponseEntity(postService.getPostById(id),HttpStatus.OK);
     }
+
+    @PreAuthorize("hasAuthority('user:write')")
+    @PostMapping("/")
+    public PostCreateResponse createResponse(@RequestBody PostCreateRequest request,Principal principal){
+        return postService.createPost(request,principal.getName());
+    }
+
+    @PreAuthorize("hasAuthority('user:write')")
+    @PutMapping("/{id}")
+    public Post
 
     @PreAuthorize("hasAuthority('moder:write')")
     @GetMapping("/moderation")

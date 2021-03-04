@@ -1,7 +1,8 @@
 package main.persistence.service;
 
-import main.dto.responce.*;
-import main.dto.responce.PostsInfo;
+import main.dto.request.PostCreateRequest;
+import main.dto.response.*;
+import main.dto.response.PostsInfo;
 import main.persistence.dao.PostDAO;
 import main.persistence.dao.UserDAO;
 import main.persistence.entity.ModerationStatus;
@@ -23,9 +24,35 @@ public class PostService {
 
     private final PostDAO postDAO;
 
+    private final UserDAO userDAO;
+
     @Autowired
-    public PostService(PostDAO postDAO) {
+    public PostService(PostDAO postDAO, UserDAO userDAO) {
         this.postDAO = postDAO;
+        this.userDAO = userDAO;
+    }
+
+
+    //TODO tagList
+    public PostCreateResponse createPost(PostCreateRequest request,String email){
+        HashMap<String,String> errors = getPostCreateErrors(request);
+        boolean result = false;
+        if(errors.keySet().size() == 0){
+            Post post = new Post();
+            post.setActive(request.isActive());
+            post.setUser(userDAO.getUserByEmail(email));
+            post.setTime(new Date(request.getTimestamp()/1000));
+            post.setTagList(null);
+            post.setTitle(request.getTitle());
+            post.setText(request.getText());
+            postDAO.savePost(post);
+            result=true;
+        }
+        return new PostCreateResponse(result,errors);
+    }
+
+    private HashMap<String, String> getPostCreateErrors(PostCreateRequest request) {
+        return null;
     }
 
 

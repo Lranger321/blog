@@ -1,7 +1,7 @@
 package main.persistence.service;
 
 import main.dto.request.AuthRequest;
-import main.dto.responce.*;
+import main.dto.response.*;
 import main.persistence.dao.CaptchaDAO;
 import main.persistence.dao.PostDAO;
 import main.persistence.dao.UserDAO;
@@ -13,12 +13,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpSession;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 @Service
 public class UserService {

@@ -1,7 +1,7 @@
 package main.persistence.service;
 
 import com.google.gson.Gson;
-import main.dto.responce.*;
+import main.dto.response.*;
 import main.persistence.entity.Comment;
 import main.persistence.entity.Post;
 import main.persistence.entity.User;

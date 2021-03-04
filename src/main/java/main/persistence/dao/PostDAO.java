@@ -31,6 +31,10 @@ public class PostDAO {
         this.postPageRepository = postPageRepository;
     }
 
+    public void savePost(Post post){
+        postRepository.save(post);
+    }
+
     public List<Post> getPosts(String mode, int offset, int limit) {
         return (mode != null) ? getSortedPosts(mode, offset, limit) :
                 getSortedPosts("recent", offset, limit);

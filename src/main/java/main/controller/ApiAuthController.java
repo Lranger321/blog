@@ -2,16 +2,15 @@ package main.controller;
 
 import main.dto.request.AuthRequest;
 import main.dto.request.UserRequest;
-import main.dto.responce.AuthResponse;
-import main.dto.responce.CaptchaResponse;
-import main.dto.responce.RegisterDto;
+import main.dto.response.AuthResponse;
+import main.dto.response.CaptchaResponse;
+import main.dto.response.RegisterDto;
 import main.persistence.service.CaptchaService;
 import main.persistence.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import java.security.Principal;
 
 @RestController

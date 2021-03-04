@@ -1,11 +1,9 @@
-package main.dto.responce;
+package main.dto.response;
 
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import main.dto.responce.UserDtoResponse;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PUBLIC)

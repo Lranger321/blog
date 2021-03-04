@@ -1,9 +1,9 @@
 package main.controller;
 
-import main.dto.responce.CalendarInfo;
-import main.dto.responce.SettingsResponse;
-import main.dto.responce.TagStorage;
-import main.dto.responce.InitStorage;
+import main.dto.response.CalendarInfo;
+import main.dto.response.SettingsResponse;
+import main.dto.response.TagStorage;
+import main.dto.response.InitStorage;
 import main.persistence.service.PostService;
 import main.persistence.service.SettingsService;
 import main.persistence.service.TagService;

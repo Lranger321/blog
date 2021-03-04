@@ -1,7 +1,7 @@
 package main.persistence.service;
 
 import com.github.cage.GCage;
-import main.dto.responce.CaptchaResponse;
+import main.dto.response.CaptchaResponse;
 import main.persistence.dao.CaptchaDAO;
 import main.persistence.entity.CaptchaCode;
 import org.springframework.stereotype.Service;

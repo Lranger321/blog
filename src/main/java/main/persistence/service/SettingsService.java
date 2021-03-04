@@ -1,6 +1,6 @@
 package main.persistence.service;
 
-import main.dto.responce.SettingsResponse;
+import main.dto.response.SettingsResponse;
 import main.persistence.dao.SettingsDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
