@@ -21,5 +21,12 @@ public class TagDAO {
         return (List<Tag>) tagRepository.findAll();
     }
 
+    public Tag getTagByName(String name){
+        return tagRepository.getByName(name).orElse(null);
+    }
+
+    public void saveTag(Tag tag){
+        tagRepository.save(tag);
+    }
 
 }

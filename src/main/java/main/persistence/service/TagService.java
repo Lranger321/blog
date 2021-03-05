@@ -8,6 +8,7 @@ import main.persistence.entity.Post;
 import main.persistence.entity.Tag;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -33,6 +34,21 @@ public class TagService {
             tagStorage.addTag(tagInfo);
         });
         return tagStorage;
+    }
+
+    public List<Tag> createTagList(List<String> tags) {
+        List<Tag> tagList = new ArrayList<>();
+        for (String name : tags) {
+            Tag tag = tagDAO.getTagByName(name);
+            if (tag == null) {
+                tag = new Tag();
+                tag.setName(name);
+                tagDAO.saveTag(tag);
+                tag = tagDAO.getTagByName(name);
+            }
+            tagList.add(tag);
+        }
+        return tagList;
     }
 
 

@@ -1,6 +1,7 @@
 package main.persistence.dao;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -73,29 +74,22 @@ public class PostDAO {
         return posts;
     }
 
-    public List<Post> getPostByDate(String date) {
-        List<Post> posts = getSortedPosts("recent", 0, getPostCount());
-        posts.removeIf(post -> {
+    public List<Post> getPostByDate(int offset,int limit,String date) {
+        Pageable pageable = PageRequest.of(offset,offset+limit);
+        try {
             Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(post.getTime().getTime());
-            String postDate = dateFormat.format(calendar.getTime());
-            return !(postDate.equals(date));
-        });
-        return posts;
+            calendar.setTime(dateFormat.parse(date));
+            calendar.add(Calendar.DATE,1);
+            return postPageRepository.findPostByDate(pageable,dateFormat.parse(date),calendar.getTime());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
     }
 
-    public List<Post> getPostByTag(String tag) {
-        List<Post> list = postRepository.findAll();
-        return list.stream().filter(post -> {
-            boolean containsTag = false;
-            for (Tag postTag : post.getTagList()) {
-                if (postTag.getName().equals(tag)) {
-                    containsTag = true;
-                    break;
-                }
-            }
-            return containsTag;
-        }).collect(Collectors.toList());
+    public List<Post> getPostByTag(int offset, int limit, String tag) {
+        Pageable pageable = PageRequest.of(offset,offset+limit);
+        return postPageRepository.findPostsByTag(pageable,tag);
     }
 
     public List<Post> searchPosts(int offset, int limit, String text) {
