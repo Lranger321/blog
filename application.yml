@@ -6,6 +6,10 @@ spring.liquibase.enabled: true
 spring.liquibase.change-log: classpath:db.changelog\changelog-master.xml
 spring.jackson.serialization-inclusion: non_null
 
+mail.password: 74c114b8844644c661cc708121715675-29561299-4b0f8a9e
+mail.url: https://api.mailgun.net/v3/sandboxcad921fc99ff4cc39294759a39a46899.mailgun.org
+mail.fromMail: k.nikitaigorevich@gmail.com
+
 blog.title: DevPub
 blog.subtitle: Рассказы разработчиков
 blog.phone: +7 903 666-44-55

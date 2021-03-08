@@ -1,10 +1,10 @@
 package main.controller;
 
 import main.dto.request.AuthRequest;
+import main.dto.request.ChangePasswordRequest;
+import main.dto.request.PasswordRestoreRequest;
 import main.dto.request.UserRequest;
-import main.dto.response.AuthResponse;
-import main.dto.response.CaptchaResponse;
-import main.dto.response.RegisterDto;
+import main.dto.response.*;
 import main.persistence.service.CaptchaService;
 import main.persistence.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,4 +49,13 @@ public class ApiAuthController {
                 user.getCaptchaSecret());
     }
 
+    @PostMapping("/restore")
+    public PasswordRestoreResponse restore(@RequestBody PasswordRestoreRequest restoreRequest){
+        return userService.passwordRestore(restoreRequest);
+    }
+
+    @PostMapping("/password")
+    public ChangePasswordResponse changePassword(@RequestBody ChangePasswordRequest request){
+        return userService.changePassword(request);
+    }
 }
