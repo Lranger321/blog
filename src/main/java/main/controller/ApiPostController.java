@@ -4,6 +4,7 @@ import main.dto.request.PostCreateRequest;
 import main.dto.response.PostCreateResponse;
 import main.dto.response.PostViewResponse;
 import main.dto.response.PostsInfo;
+import main.persistence.service.PostGettingService;
 import main.persistence.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,40 +20,43 @@ public class ApiPostController {
 
     private final PostService postService;
 
+    private final PostGettingService postGettingService;
+
     @Autowired
-    public ApiPostController(PostService postService) {
+    public ApiPostController(PostService postService, PostGettingService postGettingService) {
         this.postService = postService;
+        this.postGettingService = postGettingService;
     }
 
 
     @GetMapping("")
     public PostsInfo getPosts(int limit, int offset, String mode) {
         System.out.println(offset + "  " + limit);
-        return postService.getPosts(offset, limit, mode);
+        return postGettingService.getPosts(offset, limit, mode);
     }
 
     @GetMapping("/byDate")
     public PostsInfo getPostsByDate(int offset, int limit, String date) {
-        return postService.getPostByDate(offset, limit, date);
+        return postGettingService.getPostByDate(offset, limit, date);
     }
 
     @GetMapping("/byTag")
     public PostsInfo getPostByTag(int offset, int limit, String tag) {
-        return postService.getPostByTag(offset, limit, tag);
+        return postGettingService.getPostByTag(offset, limit, tag);
     }
 
     @GetMapping("/search")
     public PostsInfo searchPosts(int offset, int limit, String query) {
-        return postService.searchPosts(offset, limit, query);
+        return postGettingService.searchPosts(offset, limit, query);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PostViewResponse> getPostById(@PathVariable int id) {
-        PostViewResponse postViewResponse = postService.getPostById(id);
+        PostViewResponse postViewResponse = postGettingService.getPostById(id);
         if (postViewResponse == null) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity(postService.getPostById(id), HttpStatus.OK);
+        return new ResponseEntity(postGettingService.getPostById(id), HttpStatus.OK);
     }
 
     @PreAuthorize("hasAuthority('user:write')")
@@ -64,7 +68,7 @@ public class ApiPostController {
     @PreAuthorize("hasAuthority('moder:write')")
     @GetMapping("/moderation")
     public PostsInfo getPostsForModeration(int offset, int limit, String status, Principal principal) {
-        return postService.getPostsForModeration(offset, limit, status, principal.getName());
+        return postGettingService.getPostsForModeration(offset, limit, status, principal.getName());
     }
 
     @PreAuthorize("hasAuthority('user:write')")
@@ -77,7 +81,7 @@ public class ApiPostController {
     @PreAuthorize("hasAuthority('user:write')")
     @GetMapping("/my")
     public PostsInfo getPostByUser(int offset, int limit, String status, Principal principal) {
-        return postService.getPostByUser(offset, limit, status, principal.getName());
+        return postGettingService.getPostByUser(offset, limit, status, principal.getName());
     }
 
 }

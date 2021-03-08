@@ -7,7 +7,7 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDtoResponse {
 
-    private int id;
+    private long id;
 
     private String name;
 
@@ -19,6 +19,6 @@ public class UserDtoResponse {
 
     private Boolean moderation;
 
-    private int moderationCount;
+    private long moderationCount;
 
 }

@@ -8,6 +8,6 @@ import java.util.Optional;
 
 public interface TagRepository extends CrudRepository<Tag,Integer> {
 
-    Optional<Tag> getByName(String Name);
+    Optional<Tag> findByName(String Name);
 
 }

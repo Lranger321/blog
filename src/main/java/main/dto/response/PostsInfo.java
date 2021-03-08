@@ -10,7 +10,7 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PostsInfo {
 
-    private int count = 0;
+    private Long count;
 
     private List<PostDtoResponse> posts = new ArrayList<>();
 

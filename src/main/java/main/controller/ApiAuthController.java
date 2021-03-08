@@ -27,7 +27,6 @@ public class ApiAuthController {
         this.captchaService = captchaService;
     }
 
-
     @GetMapping("/check")
     public ResponseEntity<AuthResponse> authCheck(Principal principal){
         return ResponseEntity.ok(userService.checkAuth(principal));

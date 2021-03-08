@@ -1,19 +1,18 @@
 package main.persistence.service;
 
-import com.google.gson.Gson;
+import main.dto.request.CommentCreateRequest;
+import main.dto.request.ModerationRequest;
 import main.dto.request.PostCreateRequest;
 import main.dto.response.*;
-import main.dto.response.PostsInfo;
-import main.persistence.dao.PostDAO;
-import main.persistence.dao.UserDAO;
-import main.persistence.entity.ModerationStatus;
-import main.persistence.entity.Post;
+import main.persistence.entity.*;
+import main.persistence.repository.CommentRepository;
+import main.persistence.repository.PostRepository;
+import main.persistence.repository.TagRepository;
+import main.persistence.repository.UserRepository;
 import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -22,50 +21,71 @@ import java.util.List;
 @Service
 public class PostService {
 
-    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private final TagRepository tagRepository;
 
-    private final PostDAO postDAO;
+    private final PostRepository postRepository;
 
-    private final UserDAO userDAO;
+    private final UserRepository userRepository;
 
-    private final TagService tagService;
+    private final CommentRepository commentRepository;
+
+    private final EntityConverter entityConverter;
 
     @Autowired
-    public PostService(PostDAO postDAO, UserDAO userDAO, TagService tagService) {
-        this.postDAO = postDAO;
-        this.userDAO = userDAO;
-        this.tagService = tagService;
+    public PostService(TagRepository tagRepository, PostRepository postRepository,
+                       UserRepository userRepository, CommentRepository commentRepository,
+                       EntityConverter entityConverter) {
+        this.tagRepository = tagRepository;
+        this.postRepository = postRepository;
+        this.userRepository = userRepository;
+        this.commentRepository = commentRepository;
+        this.entityConverter = entityConverter;
     }
 
-    public PostCreateResponse updatePost(PostCreateRequest request, int id,String email) {
-        Post post = postDAO.getPostById(id);
-        if(post.getUser().getEmail().equals(email)){
+    public PostCreateResponse updatePost(PostCreateRequest request, long id, String email) {
+        Post post = postRepository.findById(id);
+        if (post.getUser().getEmail().equals(email)) {
             return new PostCreateResponse(false, null);
         }
-        return savePost(post,request,email);
+        return savePost(post, request, email);
     }
 
     public PostCreateResponse createPost(PostCreateRequest request, String email) {
-        return savePost(new Post(),request,email);
+        return savePost(new Post(), request, email);
     }
 
-    private PostCreateResponse savePost(Post post,PostCreateRequest request,String email){
+    private PostCreateResponse savePost(Post post, PostCreateRequest request, String email) {
         HashMap<String, String> errors = getPostCreateErrors(request);
         boolean result = false;
+        User user = userRepository.findByEmail(email).orElse(null);
         System.out.println(errors);
-        if (errors == null) {
+        if (errors == null && user != null) {
             post.setActive(request.isActive());
-            post.setUser(userDAO.getUserByEmail(email));
+            post.setUser(user);
             post.setTime(new Date(request.getTimestamp() / 1000));
-            post.setTagList(tagService.createTagList(request.getTags()));
+            post.setTagList(createTagList(request.getTags()));
             post.setTitle(request.getTitle());
             post.setText(request.getText());
             post.setModerationStatus(ModerationStatus.NEW);
-            postDAO.savePost(post);
-            System.out.println(new Gson().toJson(post, Post.class));
+            postRepository.save(post);
             result = true;
         }
         return new PostCreateResponse(result, errors);
+    }
+
+    private List<Tag> createTagList(List<String> tags) {
+        List<Tag> tagList = new ArrayList<>();
+        for (String name : tags) {
+            Tag tag = tagRepository.findByName(name).orElse(null);
+            if (tag == null) {
+                tag = new Tag();
+                tag.setName(name);
+                tagRepository.save(tag);
+                tag = tagRepository.findByName(name).get();
+            }
+            tagList.add(tag);
+        }
+        return tagList;
     }
 
     private HashMap<String, String> getPostCreateErrors(PostCreateRequest request) {
@@ -82,101 +102,53 @@ public class PostService {
         return errors;
     }
 
-
-    public PostsInfo getPosts(int offset, int limit, String mode) {
-        List<PostDtoResponse> posts = Converter.createPostDtoList(postDAO.getPosts(mode, offset, limit));
-        int count = postDAO.getPostCount();
-        return Converter.convertToPostsInfo(posts, count);
-    }
-
-    public PostsInfo getPostByDate(int offset, int limit, String date) {
-        List<PostDtoResponse> posts = Converter.createPostDtoList(postDAO.getPostByDate(offset, limit, date));
-        return Converter.convertToPostsInfo(posts, posts.size());
-    }
-
-    public PostsInfo getPostByTag(int offset, int limit, String tag) {
-        List<PostDtoResponse> posts = Converter.createPostDtoList(postDAO.getPostByTag(offset, limit, tag));
-        return Converter.convertToPostsInfo(posts, posts.size());
-    }
-
-    public CalendarInfo getCalendar(String inputYear) {
-        if (inputYear == null) {
-            inputYear = dateFormat.format(new Date()).split("-")[0];
-        }
-        List<Integer> years = new ArrayList<>();
-        HashMap<String, Integer> postsCalendar = new HashMap<>();
-        String finalInputYear = inputYear;
-        postDAO.getPosts("recent", 0, postDAO.getPostCount()).forEach(post -> {
-            String date = dateFormat.format(post.getTime());
-            int year = Integer.parseInt(date.split("-")[0]);
-            if (!years.contains(year)) {
-                years.add(year);
-            }
-            if (Integer.toString(year).equals(finalInputYear)) {
-                postsCalendar.put(date, postsCalendar.getOrDefault(date, 0) + 1);
-            }
-        });
-        return Converter.createCalendarInfo(postsCalendar, years);
-    }
-
-    public PostsInfo searchPosts(int offset, int limit, String query) {
-        List<PostDtoResponse> posts = Converter.createPostDtoList(postDAO.searchPosts(offset, limit, query));
-        int count = postDAO.getCountByQuery(query);
-        return Converter.convertToPostsInfo(posts, count);
-    }
-
-    public PostViewResponse getPostById(int id) {
-        PostViewResponse postViewResponse;
-        Post post = postDAO.getPostById(id);
-        if (post == null) {
-            postViewResponse = null;
+    public CommentCreateResponse createComment(CommentCreateRequest commentCreateRequest, String email) {
+        CommentCreateResponse response = new CommentCreateResponse();
+        HashMap<String, String> errors = createCommentErrors(commentCreateRequest);
+        if (errors.keySet().isEmpty()) {
+            Post post = postRepository.findById(commentCreateRequest.getPostId());
+            Comment comment = entityConverter.createComment(commentCreateRequest, email, post);
+            List<Comment> comments = post.getComments();
+            comments.add(comment);
+            post.setComments(comments);
+            response.setId(commentRepository.save(comment).getId());
+            postRepository.save(post);
         } else {
-            postViewResponse = Converter.createPostViewResponse(post);
+            response.setResult(false);
+            response.setErrors(errors);
         }
-        return postViewResponse;
+        return response;
     }
 
-    public PostsInfo getPostsForModeration(int offset, int limit, String status, String userName) {
-        List<Post> posts = new ArrayList<>();
-        int count = 0;
-        switch (status) {
-            case "new":
-                posts = postDAO.getNewPostsForModeration(offset, limit);
-                count = postDAO.getCountForModeration();
-                break;
-            case "declined":
-                posts = postDAO.getPostForModeration(offset, limit, ModerationStatus.DECLINED, userName);
-                count = postDAO.getCountForModerationByStatusAndUser(ModerationStatus.DECLINED, userName);
-                break;
-            case "accepted":
-                posts = postDAO.getPostForModeration(offset, limit, ModerationStatus.ACCEPTED, userName);
-                count = postDAO.getCountForModerationByStatusAndUser(ModerationStatus.ACCEPTED, userName);
-                break;
+    public ModerationResponse moderation(ModerationRequest request, String email) {
+        Post post = postRepository.findById(request.getPostId());
+        User moderator = userRepository.findByEmail(email).orElse(null);
+        System.out.println(post + " " + moderator);
+        if (post != null && moderator != null) {
+            switch (request.getDecision()) {
+                case "new":
+                    post.setModerationStatus(ModerationStatus.NEW);
+                    break;
+                case "accept":
+                    post.setModerationStatus(ModerationStatus.ACCEPTED);
+                    break;
+                case "decline":
+                    post.setModerationStatus(ModerationStatus.DECLINED);
+                    break;
+            }
+            post.setModerator(moderator);
+            postRepository.save(post);
+            return new ModerationResponse(true);
         }
-        List<PostDtoResponse> postDtoResponseList = Converter.createPostDtoList(posts);
-        return Converter.convertToPostsInfo(postDtoResponseList, count);
+        return new ModerationResponse(false);
     }
 
-
-    public PostsInfo getPostByUser(int offset, int limit, String status, String name) {
-        List<Post> posts = new ArrayList<>();
-        int count = 0;
-        switch (status) {
-            case "inactive":
-                posts = postDAO.getInactivePostByUser(offset, limit, name);
-                break;
-            case "pending":
-                posts = postDAO.getPostByUserAndModerationStatus(offset, limit, name, ModerationStatus.NEW);
-                break;
-            case "declined":
-                posts = postDAO.getPostByUserAndModerationStatus(offset, limit, name, ModerationStatus.DECLINED);
-                break;
-            case "published":
-                posts = postDAO.getPostByUserAndModerationStatus(offset, limit, name, ModerationStatus.ACCEPTED);
-                break;
+    private HashMap<String, String> createCommentErrors(CommentCreateRequest commentCreateRequest) {
+        HashMap<String, String> errors = new HashMap<>();
+        if (Jsoup.parse(commentCreateRequest.getText()).text().length() < 2) {
+            errors.put("text", "Текст комментария не задан или слишком короткий");
         }
-        List<PostDtoResponse> list = Converter.createPostDtoList(posts);
-        return Converter.convertToPostsInfo(list, count);
+        return errors;
     }
 
 }

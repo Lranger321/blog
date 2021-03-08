@@ -33,7 +33,7 @@ public class Converter {
         return responseList;
     }
 
-    public static PostsInfo convertToPostsInfo(List<PostDtoResponse> posts, int count) {
+    public static PostsInfo convertToPostsInfo(List<PostDtoResponse> posts, long count) {
         PostsInfo postsInfo = new PostsInfo();
         postsInfo.setCount(count);
         postsInfo.setPosts(posts);
@@ -46,7 +46,7 @@ public class Converter {
         return authResponse;
     }
 
-    public static AuthResponse createAuthResponse(Boolean status, User user,int moderationCount) {
+    public static AuthResponse createAuthResponse(Boolean status, User user, long moderationCount) {
         AuthResponse authResponse = new AuthResponse();
         authResponse.setResult(status);
         UserDtoResponse userDtoResponse = new UserDtoResponse();

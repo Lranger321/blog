@@ -1,16 +1,16 @@
 package main.controller;
 
-import main.dto.response.CalendarInfo;
-import main.dto.response.SettingsResponse;
-import main.dto.response.TagStorage;
-import main.dto.response.InitStorage;
-import main.persistence.service.PostService;
-import main.persistence.service.SettingsService;
-import main.persistence.service.TagService;
+import main.dto.request.CommentCreateRequest;
+import main.dto.request.ModerationRequest;
+import main.dto.response.*;
+import main.persistence.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api")
@@ -24,13 +24,19 @@ public class ApiGeneralController {
 
     private final TagService tagService;
 
+    private final ImageService imageService;
+
+    private final PostGettingService postGettingService;
+
     @Autowired
     public ApiGeneralController(InitStorage initStorage, SettingsService settingsService,
-                                PostService postService, TagService tagService) {
+                                PostService postService, TagService tagService, ImageService imageService, PostGettingService postGettingService) {
         this.initStorage = initStorage;
         this.settingsService = settingsService;
         this.postService = postService;
         this.tagService = tagService;
+        this.imageService = imageService;
+        this.postGettingService = postGettingService;
     }
 
     @GetMapping("/init")
@@ -45,12 +51,31 @@ public class ApiGeneralController {
 
     @GetMapping("/calendar")
     public CalendarInfo getCalendar(String year) {
-        return postService.getCalendar(year);
+        return postGettingService.getCalendar(year);
     }
 
     @GetMapping("/tag")
     public TagStorage getTag() {
         return tagService.countAllWeight();
+    }
+
+    @PostMapping(value = "/image",produces="multipart/form-data")
+    public ResponseEntity saveImage(MultipartFile multipartFile){
+        imageService.saveImage(multipartFile);
+        return null;
+    }
+
+    @PreAuthorize("hasAuthority('user:write')")
+    @PostMapping("/comment")
+    public ResponseEntity<CommentCreateResponse> commentCreate(@RequestBody CommentCreateRequest commentCreateRequest,
+                                                               Principal principal){
+        return ResponseEntity.ok(postService.createComment(commentCreateRequest,principal.getName()));
+    }
+
+    @PreAuthorize("hasAuthority('moder:write')")
+    @PostMapping("/moderation")
+    public ModerationResponse moderation(@RequestBody ModerationRequest request,Principal principal){
+        return postService.moderation(request,principal.getName());
     }
 
 }

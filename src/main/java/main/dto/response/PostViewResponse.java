@@ -10,14 +10,14 @@ import lombok.Data;
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 public class PostViewResponse {
 
-    private int id;
+    private long id;
     private long timestamp;
     private UserDtoResponse user;
     private String title;
     private String text;
-    private int likeCount;
-    private int dislikeCount;
-    private int viewCount;
+    private long likeCount;
+    private long dislikeCount;
+    private long viewCount;
     private List<CommentInfo> comments;
     private List<String> tags;
 

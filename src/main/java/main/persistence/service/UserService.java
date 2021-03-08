@@ -2,10 +2,10 @@ package main.persistence.service;
 
 import main.dto.request.AuthRequest;
 import main.dto.response.*;
-import main.persistence.dao.CaptchaDAO;
-import main.persistence.dao.PostDAO;
-import main.persistence.dao.UserDAO;
 import main.persistence.entity.User;
+import main.persistence.repository.CaptchaRepository;
+import main.persistence.repository.PostRepository;
+import main.persistence.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,34 +17,35 @@ import java.security.Principal;
 import java.util.Date;
 import java.util.HashMap;
 
+//todo убрать DAO
 @Service
 public class UserService {
 
-    private final UserDAO userDAO;
-
-    private final CaptchaDAO captchaDAO;
+    private final CaptchaRepository captchaRepository;
 
     private final AuthenticationManager authenticationManager;
 
     private final PasswordEncoder passwordEncoder;
 
-    private final PostDAO postDAO;
+    private final UserRepository userRepository;
 
-    public UserService(UserDAO userDAO, CaptchaDAO captchaDAO,
-                       AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, PostDAO postDAO) {
-        this.userDAO = userDAO;
-        this.captchaDAO = captchaDAO;
+    private final PostRepository postRepository;
+
+    public UserService(CaptchaRepository captchaRepository, AuthenticationManager authenticationManager,
+                       PasswordEncoder passwordEncoder, UserRepository userRepository, PostRepository postRepository) {
+        this.captchaRepository = captchaRepository;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
-        this.postDAO = postDAO;
+        this.userRepository = userRepository;
+        this.postRepository = postRepository;
     }
 
 
     public AuthResponse checkAuth(Principal principal) {
         AuthResponse authResponse;
         if (principal != null) {
-            User user = userDAO.getUserByEmail(principal.getName());
-            int moderationCount = (user.isModerator()) ? postDAO.getCountForModeration() : 0;
+            User user = userRepository.findByEmail(principal.getName()).orElse(null);
+            long moderationCount = (user.isModerator()) ? postRepository.countOfModeration() : 0;
             authResponse = Converter.createAuthResponse(true, user, moderationCount);
         } else {
             authResponse = Converter.createAuthResponse(false);
@@ -56,8 +57,8 @@ public class UserService {
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(auth);
-        User userInDB = userDAO.getUserByEmail(request.getEmail());
-        int moderationCount = (userInDB.isModerator()) ? postDAO.getCountForModeration() : 0;
+        User userInDB = userRepository.findByEmail(request.getEmail()).orElse(null);
+        long moderationCount = (userInDB.isModerator()) ? postRepository.countOfModeration() : 0;
         return Converter.createAuthResponse(true, userInDB, moderationCount);
     }
 
@@ -78,7 +79,7 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(password));
             user.setCode(captchaSecret);
             System.out.println(user.getPassword());
-            userDAO.saveUser(user);
+            userRepository.save(user);
             registerDto.setResult(true);
         } else {
             registerDto.setResult(false);
@@ -90,13 +91,13 @@ public class UserService {
     private HashMap<String, String> registerErrors(String email, String password, String name, String captcha,
                                                    String captchaSecret) {
         HashMap<String, String> errors = new HashMap<>();
-        if (userDAO.getUserByEmail(email) != null) {
+        if (!userRepository.findByEmail(email).isPresent()) {
             errors.put("e_mail", "Этот e-mail уже зарегистрирован");
         }
         if (password.length() < 6) {
             errors.put("password", "Пароль короче 6-ти символов");
         }
-        if (!captchaDAO.getCaptcha(captchaSecret).getCode().equals(captcha)) {
+        if (!captchaRepository.findBySecretCode(captchaSecret).get().getCode().equals(captcha)) {
             errors.put("captcha", "Код с картинки введён неверно");
         }
         if(name.length() < 3){
