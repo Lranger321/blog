@@ -151,4 +151,8 @@ public class PostService {
         return errors;
     }
 
+    public void setVote(){
+
+    }
+
 }
