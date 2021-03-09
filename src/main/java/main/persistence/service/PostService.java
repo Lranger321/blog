@@ -3,16 +3,15 @@ package main.persistence.service;
 import main.dto.request.CommentCreateRequest;
 import main.dto.request.ModerationRequest;
 import main.dto.request.PostCreateRequest;
+import main.dto.request.VoteRequest;
 import main.dto.response.*;
 import main.persistence.entity.*;
-import main.persistence.repository.CommentRepository;
-import main.persistence.repository.PostRepository;
-import main.persistence.repository.TagRepository;
-import main.persistence.repository.UserRepository;
+import main.persistence.repository.*;
 import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.attribute.UserPrincipalNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,15 +30,18 @@ public class PostService {
 
     private final EntityConverter entityConverter;
 
+    private final VotesRepository votesRepository;
+
     @Autowired
     public PostService(TagRepository tagRepository, PostRepository postRepository,
                        UserRepository userRepository, CommentRepository commentRepository,
-                       EntityConverter entityConverter) {
+                       EntityConverter entityConverter, VotesRepository votesRepository) {
         this.tagRepository = tagRepository;
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
         this.entityConverter = entityConverter;
+        this.votesRepository = votesRepository;
     }
 
     public PostCreateResponse updatePost(PostCreateRequest request, long id, String email) {
@@ -151,8 +153,22 @@ public class PostService {
         return errors;
     }
 
-    public void setVote(){
-
+    public VoteResponse setVote(VoteRequest request, String email, boolean value){
+        Vote vote = new Vote();
+        try {
+            vote.setUser(userRepository.findByEmail(email).orElseThrow((()-> new UserPrincipalNotFoundException("User not found"))));
+        } catch (UserPrincipalNotFoundException e) {
+            e.printStackTrace();
+            return new VoteResponse(false);
+        }
+        vote.setTime(new Date());
+        vote.setValue(value);
+        Post post = postRepository.findById(request.getPostId());
+        List votes = post.getVotes();
+        votes.add(votesRepository.save(vote));
+        post.setVotes(votes);
+        postRepository.save(post);
+        return new VoteResponse(true);
     }
 
 }

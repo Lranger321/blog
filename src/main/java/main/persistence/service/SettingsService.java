@@ -1,6 +1,9 @@
 package main.persistence.service;
 
+import main.dto.request.SetSettingsRequest;
+import main.dto.response.SetSettingsResponse;
 import main.dto.response.SettingsResponse;
+import main.persistence.entity.GlobalSetting;
 import main.persistence.repository.GlobalSettingsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +31,26 @@ public class SettingsService {
             }
         });
         return response;
+    }
+
+    public SetSettingsResponse setSettings(SetSettingsRequest request){
+        try {
+            GlobalSetting multiUserMode = repository.findByCode("MULTIUSER_MODE").orElse(null);
+            GlobalSetting preModeration = repository.findByCode("POST_PREMODERATION").orElse(null);
+            GlobalSetting statIsPublic = repository.findByCode("STATISTICS_IS_PUBLIC").orElse(null);
+            if(multiUserMode != null || preModeration !=null || statIsPublic != null) {
+                multiUserMode.setValue(request.isMultiUserMode());
+                preModeration.setValue(request.isPostPreModeration());
+                statIsPublic.setValue(request.isStatisticsIsPublic());
+                repository.save(multiUserMode);
+                repository.save(preModeration);
+                repository.save(statIsPublic);
+                return new SetSettingsResponse(true);
+            }
+        }catch (NullPointerException ex){
+            ex.printStackTrace();
+            return new SetSettingsResponse(false);
+        }
     }
 
 }
