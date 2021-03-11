@@ -1,9 +1,11 @@
 package main.controller;
 
 import main.dto.request.PostCreateRequest;
+import main.dto.request.VoteRequest;
 import main.dto.response.PostCreateResponse;
 import main.dto.response.PostViewResponse;
 import main.dto.response.PostsInfo;
+import main.dto.response.VoteResponse;
 import main.persistence.service.PostGettingService;
 import main.persistence.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,4 +86,15 @@ public class ApiPostController {
         return postGettingService.getPostByUser(offset, limit, status, principal.getName());
     }
 
+    @PreAuthorize("hasAuthority('user:write')")
+    @PostMapping("/like")
+    public VoteResponse likePost(@RequestBody VoteRequest request, Principal principal){
+        return postService.setVote(request,principal.getName(),1);
+    }
+
+    @PreAuthorize("hasAuthority('user:write')")
+    @PostMapping("/dislike")
+    public VoteResponse dislikePost(@RequestBody VoteRequest request, Principal principal){
+        return postService.setVote(request,principal.getName(),-1);
+    }
 }

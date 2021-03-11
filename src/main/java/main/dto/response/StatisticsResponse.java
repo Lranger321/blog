@@ -5,14 +5,14 @@ import lombok.Data;
 @Data
 public class StatisticsResponse {
 
-    private long postCount;
+    private Long postsCount;
 
-    private long likesCount;
+    private Long likesCount;
 
-    private long dislikeCount;
+    private Long dislikesCount;
 
-    private long viewCount;
+    private Long viewsCount;
 
-    private long firstPublication;
+    private Long firstPublication;
 
 }

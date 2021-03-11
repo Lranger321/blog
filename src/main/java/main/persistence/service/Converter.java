@@ -21,8 +21,8 @@ public class Converter {
             UserDtoResponse user = new UserDtoResponse();
             user.setId(post.getUser().getId());
             user.setName(post.getUser().getName());
-            int likeCount = (int) post.getVotes().stream().filter(Vote::getValue).count();
-            int disLikeCount = (int) post.getVotes().stream().filter(vote -> !vote.getValue()).count();
+            int likeCount = (int) post.getVotes().stream().filter(vote -> vote.getValue()==1).count();
+            int disLikeCount = (int) post.getVotes().stream().filter(vote -> vote.getValue()==-1).count();
             PostDtoResponse postInfo = new PostDtoResponse(post.getId(),
                     post.getTime().getTime() / 1000, user,
                     post.getTitle(), Jsoup.parse(post.getText()).text(),
@@ -66,8 +66,8 @@ public class Converter {
         UserDtoResponse userDtoResponse = new UserDtoResponse();
         userDtoResponse.setName(post.getUser().getName());
         userDtoResponse.setId(post.getUser().getId());
-        int likeCount = (int) post.getVotes().stream().filter(Vote::getValue).count();
-        int disLikeCount = (int) post.getVotes().stream().filter(vote -> !vote.getValue()).count();
+        int likeCount = (int) post.getVotes().stream().filter(vote -> vote.getValue()==1).count();
+        int disLikeCount = (int) post.getVotes().stream().filter(vote -> vote.getValue()==-1).count();
         List<String> tags = new ArrayList<>();
         post.getTagList().forEach(tag -> tags.add(tag.getName()));
         PostViewResponse postViewResponse = new PostViewResponse(

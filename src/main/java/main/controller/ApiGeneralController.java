@@ -22,6 +22,8 @@ public class ApiGeneralController {
 
     private final PostService postService;
 
+    private final UserService userService;
+
     private final TagService tagService;
 
     private final ImageService imageService;
@@ -30,10 +32,11 @@ public class ApiGeneralController {
 
     @Autowired
     public ApiGeneralController(InitStorage initStorage, SettingsService settingsService,
-                                PostService postService, TagService tagService, ImageService imageService, PostGettingService postGettingService) {
+                                PostService postService, UserService userService, TagService tagService, ImageService imageService, PostGettingService postGettingService) {
         this.initStorage = initStorage;
         this.settingsService = settingsService;
         this.postService = postService;
+        this.userService = userService;
         this.tagService = tagService;
         this.imageService = imageService;
         this.postGettingService = postGettingService;
@@ -76,6 +79,17 @@ public class ApiGeneralController {
     @PostMapping("/moderation")
     public ModerationResponse moderation(@RequestBody ModerationRequest request,Principal principal){
         return postService.moderation(request,principal.getName());
+    }
+
+    @PreAuthorize("hasAuthority('user:write')")
+    @GetMapping("/statistics/my")
+    public StatisticsResponse my(Principal principal){
+        return userService.getStatForUser(principal.getName());
+    }
+
+    @GetMapping("/statistics/all")
+    public StatisticsResponse getAllStat(){
+        return userService.getAllStat();
     }
 
 }

@@ -7,6 +7,6 @@ import lombok.Data;
 public class VoteRequest {
 
     @JsonProperty("post_id")
-    private long postId;
+    private int postId;
 
 }

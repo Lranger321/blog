@@ -55,7 +55,8 @@ public class ApiAuthController {
     }
 
     @PostMapping("/password")
-    public ChangePasswordResponse changePassword(@RequestBody ChangePasswordRequest request){
-        return userService.changePassword(request);
+    public ChangePasswordResponse changePassword(@RequestBody ChangePasswordRequest request,Principal principal){
+        return userService.changePassword(request,principal.getName());
     }
+
 }

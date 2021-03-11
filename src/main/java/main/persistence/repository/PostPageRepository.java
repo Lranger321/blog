@@ -15,7 +15,7 @@ public interface PostPageRepository extends PagingAndSortingRepository<Post, Int
     List<Post> findAllByIsActiveAndModerationStatus
             (Boolean active, ModerationStatus moderation, Pageable pageable);
 
-    @Query("FROM Post p WHERE p.isActive=true AND p.moderationStatus='ACCEPTED' ORDER BY p.comments.size DESC ")
+    @Query("FROM Post p WHERE p.isActive=true AND p.moderationStatus='ACCEPTED' AND p.isActive=true ORDER BY p.comments.size DESC ")
     List<Post> sortedByComments(Pageable pageable);
 
     @Query("FROM Post p where p.isActive=true AND p.moderationStatus='ACCEPTED' order by p.votes.size desc")
@@ -23,7 +23,7 @@ public interface PostPageRepository extends PagingAndSortingRepository<Post, Int
 
     //List<Post> findAllByIsActiveAndModerationStatusOrderByVotes();
 
-    @Query("FROM Post p where p.text like concat('%',:search_text,'%')")
+    @Query("FROM Post p where p.text like concat('%',:search_text,'%') and p.isActive=true")
     List<Post> searchByText(Pageable page, @Param("search_text") String Text);
 
     @Query("FROM Post p where p.moderationStatus='NEW' order by p.time DESC")

@@ -153,17 +153,21 @@ public class PostService {
         return errors;
     }
 
-    public VoteResponse setVote(VoteRequest request, String email, boolean value){
-        Vote vote = new Vote();
+    public VoteResponse setVote(VoteRequest request, String email, int value) {
+        User user;
         try {
-            vote.setUser(userRepository.findByEmail(email).orElseThrow((()-> new UserPrincipalNotFoundException("User not found"))));
+            user = userRepository.findByEmail(email).
+                    orElseThrow((() -> new UserPrincipalNotFoundException("User not found")));
         } catch (UserPrincipalNotFoundException e) {
             e.printStackTrace();
             return new VoteResponse(false);
         }
+        Post post = postRepository.findById(request.getPostId()).orElse(null);
+        Vote vote = votesRepository.findVoteByPostAndUser(email, post.getId()).orElse(new Vote());
         vote.setTime(new Date());
         vote.setValue(value);
-        Post post = postRepository.findById(request.getPostId());
+        vote.setUser(user);
+        vote.setPost(post);
         List votes = post.getVotes();
         votes.add(votesRepository.save(vote));
         post.setVotes(votes);
