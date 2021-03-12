@@ -5,13 +5,10 @@ import main.dto.request.AuthRequest;
 import main.dto.request.ChangePasswordRequest;
 import main.dto.request.PasswordRestoreRequest;
 import main.dto.response.*;
-import main.persistence.entity.ModerationStatus;
-import main.persistence.entity.Post;
 import main.persistence.entity.User;
 import main.persistence.repository.*;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,7 +26,6 @@ import java.security.Principal;
 import java.util.Date;
 import java.util.HashMap;
 
-//todo убрать DAO
 @Service
 public class UserService {
 
@@ -47,10 +43,13 @@ public class UserService {
 
     private final VotesRepository votesRepository;
 
-    private final PostPageRepository postPageRepository;
+    private final GlobalSettingsRepository settingsRepository;
 
+    @Autowired
     public UserService(SMTP smtp, CaptchaRepository captchaRepository, AuthenticationManager authenticationManager,
-                       PasswordEncoder passwordEncoder, UserRepository userRepository, PostRepository postRepository, VotesRepository votesRepository, PostPageRepository postPageRepository) {
+                       PasswordEncoder passwordEncoder, UserRepository userRepository,
+                       PostRepository postRepository, VotesRepository votesRepository,
+                       GlobalSettingsRepository settingsRepository) {
         this.smtp = smtp;
         this.captchaRepository = captchaRepository;
         this.authenticationManager = authenticationManager;
@@ -58,14 +57,14 @@ public class UserService {
         this.userRepository = userRepository;
         this.postRepository = postRepository;
         this.votesRepository = votesRepository;
-        this.postPageRepository = postPageRepository;
+        this.settingsRepository = settingsRepository;
     }
 
 
     public AuthResponse checkAuth(Principal principal) {
         AuthResponse authResponse;
         if (principal != null) {
-            User user = userRepository.findByEmail(principal.getName()).orElse(null);
+            User user = userRepository.findByEmail(principal.getName()).get();
             long moderationCount = (user.isModerator()) ? postRepository.countOfModeration() : 0;
             authResponse = Converter.createAuthResponse(true, user, moderationCount);
         } else {
@@ -75,42 +74,41 @@ public class UserService {
     }
 
     public AuthResponse login(AuthRequest request) {
-        Authentication auth = null;
         try {
-             auth = authenticationManager.authenticate(
+            Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            User userInDB = userRepository.findByEmail(request.getEmail()).get();
+            long moderationCount = (userInDB.isModerator()) ? postRepository.countOfModeration() : 0;
+            return Converter.createAuthResponse(true, userInDB, moderationCount);
         }catch (BadCredentialsException ex){
             return Converter.createAuthResponse(false);
         }
-        SecurityContextHolder.getContext().setAuthentication(auth);
-        User userInDB = userRepository.findByEmail(request.getEmail()).get();
-        long moderationCount = (userInDB.isModerator()) ? postRepository.countOfModeration() : 0;
-        return Converter.createAuthResponse(true, userInDB, moderationCount);
     }
 
-    public RegisterDto userRegister(String email, String password, String name, String captcha,
-                                    String captchaSecret) {
-        System.out.println(captchaSecret);
-        HashMap<String, String> errors = registerErrors(email, password, name, captcha, captchaSecret);
-        System.out.println(captcha);
-        System.out.println(errors.keySet().size());
+    public ResponseEntity userRegister(String email, String password, String name, String captcha,
+                                       String captchaSecret) {
         RegisterDto registerDto = new RegisterDto();
-        if (errors.keySet().size() == 0) {
-            User user = new User();
-            user.setEmail(email);
-            user.setModerator(false);
-            user.setName(name);
-            user.setRegTime(new Date());
-            user.setPassword(passwordEncoder.encode(password));
-            user.setCode(captchaSecret);
-            System.out.println(user.getPassword());
-            userRepository.save(user);
-            registerDto.setResult(true);
-        } else {
-            registerDto.setResult(false);
-            registerDto.setErrors(errors);
+        if(settingsRepository.findByCode("MULTIUSER_MODE").get().getValue()) {
+            HashMap<String, String> errors = registerErrors(email, password, name, captcha, captchaSecret);
+            if (errors.keySet().size() == 0) {
+                User user = new User();
+                user.setEmail(email);
+                user.setModerator(false);
+                user.setName(name);
+                user.setRegTime(new Date());
+                user.setPassword(passwordEncoder.encode(password));
+                user.setCode(captchaSecret);
+                userRepository.save(user);
+                registerDto.setResult(true);
+            } else {
+                registerDto.setResult(false);
+                registerDto.setErrors(errors);
+            }
+            return ResponseEntity.ok(registerDto);
+        }else {
+            return (ResponseEntity) ResponseEntity.notFound();
         }
-        return registerDto;
     }
 
     private HashMap<String, String> registerErrors(String email, String password, String name, String captcha,
@@ -132,78 +130,28 @@ public class UserService {
         return errors;
     }
 
-    public PasswordRestoreResponse passwordRestore(PasswordRestoreRequest restoreRequest) {
-        String email = restoreRequest.getEmail();
-        User user = userRepository.findByEmail(email).orElse(null);
-        if (user != null) {
-            String token = DigestUtils.md5DigestAsHex(new GCage().getTokenGenerator().next().getBytes());
-            System.out.println(token);
-            String url = "127.0.0.1:8080/login/change-password/" + token;
-            try {
-                HttpResponse<JsonNode> request = Unirest.post(smtp.getUrl() + "/messages")
-                        .basicAuth("api", smtp.getPassword())
-                        .queryString("from", smtp.getEmail())
-                        .queryString("to", email)
-                        .queryString("subject", "PubBlog restore password")
-                        .queryString("text", url)
-                        .asJson();
-                System.out.println(request.getBody());
-            } catch (UnirestException e) {
-                e.printStackTrace();
-                return null;
+
+    public ResponseEntity getAllStat(String email) {
+        if(!settingsRepository.findByCode("STATISTICS_IS_PUBLIC").get().getValue() &&
+                !userRepository.findByEmail(email).get().isModerator()) {
+                return (ResponseEntity) ResponseEntity.status(401);
             }
-            user.setCode(token);
-            userRepository.save(user);
-            return new PasswordRestoreResponse(true);
-        } else {
-            return new PasswordRestoreResponse(false);
-        }
-    }
-
-    public ChangePasswordResponse changePassword(ChangePasswordRequest request, String email) {
-        User user = userRepository.findByEmail(email).get();
-        HashMap<String, String> errors = changePasswordErrors(request, user);
-        if (!errors.keySet().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-            userRepository.save(user);
-            return new ChangePasswordResponse(true, null);
-        } else {
-            return new ChangePasswordResponse(false, errors);
-        }
-    }
-
-    private HashMap<String, String> changePasswordErrors(ChangePasswordRequest request, User user) {
-        HashMap<String, String> errors = new HashMap<>();
-        if (user.getCode().equals(request.getCode())) {
-            errors.put("code", "Ссылка для восстановления пароля устарела." +
-                    "<a href=/auth/restore\">Запросить ссылку снова</a>");
-        }
-        if (request.getPassword().length() < 6) {
-            errors.put("password", "Пароль короче 6-ти символов");
-        }
-        if (!captchaRepository.findBySecretCode(request.getSecretCode()).get().getCode().equals(request.getCaptcha())) {
-            errors.put("captcha", "Код с картинки введён неверно");
-        }
-        return errors;
-    }
-
-    public StatisticsResponse getAllStat() {
-        StatisticsResponse statisticsResponse = new StatisticsResponse();
-        long countOfPost = postRepository.count();
-        if(countOfPost > 0) {
-            statisticsResponse.setPostsCount(postRepository.count());
-            statisticsResponse.setViewsCount(postRepository.countViews());
-            statisticsResponse.setLikesCount(votesRepository.countAllByValue(1));
-            statisticsResponse.setDislikesCount(votesRepository.countAllByValue(-1));
-            statisticsResponse.setFirstPublication(postRepository.getFirstPost().getTime() * 1000);
-        }else{
-            statisticsResponse.setPostsCount(0L);
-            statisticsResponse.setViewsCount(0L);
-            statisticsResponse.setLikesCount(0L);
-            statisticsResponse.setDislikesCount(0L);
-            statisticsResponse.setFirstPublication(null);
-        }
-        return statisticsResponse;
+            StatisticsResponse statisticsResponse = new StatisticsResponse();
+            long countOfPost = postRepository.count();
+            if (countOfPost > 0) {
+                statisticsResponse.setPostsCount(postRepository.count());
+                statisticsResponse.setViewsCount(postRepository.countViews());
+                statisticsResponse.setLikesCount(votesRepository.countAllByValue(1));
+                statisticsResponse.setDislikesCount(votesRepository.countAllByValue(-1));
+                statisticsResponse.setFirstPublication(postRepository.getFirstPost().getTime() * 1000);
+            } else {
+                statisticsResponse.setPostsCount(0L);
+                statisticsResponse.setViewsCount(0L);
+                statisticsResponse.setLikesCount(0L);
+                statisticsResponse.setDislikesCount(0L);
+                statisticsResponse.setFirstPublication(null);
+            }
+            return ResponseEntity.ok(statisticsResponse);
     }
 
     public StatisticsResponse getStatForUser(String email) {

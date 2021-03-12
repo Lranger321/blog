@@ -32,16 +32,19 @@ public class PostService {
 
     private final VotesRepository votesRepository;
 
+    private final GlobalSettingsRepository settingsRepository;
+
     @Autowired
     public PostService(TagRepository tagRepository, PostRepository postRepository,
                        UserRepository userRepository, CommentRepository commentRepository,
-                       EntityConverter entityConverter, VotesRepository votesRepository) {
+                       EntityConverter entityConverter, VotesRepository votesRepository, GlobalSettingsRepository settingsRepository) {
         this.tagRepository = tagRepository;
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
         this.entityConverter = entityConverter;
         this.votesRepository = votesRepository;
+        this.settingsRepository = settingsRepository;
     }
 
     public PostCreateResponse updatePost(PostCreateRequest request, long id, String email) {
@@ -68,7 +71,11 @@ public class PostService {
             post.setTagList(createTagList(request.getTags()));
             post.setTitle(request.getTitle());
             post.setText(request.getText());
-            post.setModerationStatus(ModerationStatus.NEW);
+            if(settingsRepository.findByCode("POST_PREMODERATION").get().getValue()) {
+                post.setModerationStatus(ModerationStatus.NEW);
+            }else{
+                post.setModerationStatus(ModerationStatus.ACCEPTED);
+            }
             postRepository.save(post);
             result = true;
         }

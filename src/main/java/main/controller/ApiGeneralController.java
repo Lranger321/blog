@@ -2,6 +2,7 @@ package main.controller;
 
 import main.dto.request.CommentCreateRequest;
 import main.dto.request.ModerationRequest;
+import main.dto.request.SetSettingsRequest;
 import main.dto.response.*;
 import main.persistence.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,9 +71,9 @@ public class ApiGeneralController {
 
     @PreAuthorize("hasAuthority('user:write')")
     @PostMapping("/comment")
-    public ResponseEntity<CommentCreateResponse> commentCreate(@RequestBody CommentCreateRequest commentCreateRequest,
+    public CommentCreateResponse commentCreate(@RequestBody CommentCreateRequest commentCreateRequest,
                                                                Principal principal){
-        return ResponseEntity.ok(postService.createComment(commentCreateRequest,principal.getName()));
+        return postService.createComment(commentCreateRequest,principal.getName());
     }
 
     @PreAuthorize("hasAuthority('moder:write')")
@@ -90,6 +91,12 @@ public class ApiGeneralController {
     @GetMapping("/statistics/all")
     public StatisticsResponse getAllStat(){
         return userService.getAllStat();
+    }
+
+    @PreAuthorize("hasAnyAuthority('moder:wrtite')")
+    @PutMapping("/settings")
+    public SetSettingsResponse setSettings(@RequestBody SetSettingsRequest request){
+        return settingsService.setSettings(request);
     }
 
 }
