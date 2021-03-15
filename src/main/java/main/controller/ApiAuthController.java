@@ -7,6 +7,7 @@ import main.dto.request.UserRequest;
 import main.dto.response.*;
 import main.persistence.service.CaptchaService;
 import main.persistence.service.UserService;
+import main.persistence.service.UserUpdateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,10 +22,13 @@ public class ApiAuthController {
 
     private final CaptchaService captchaService;
 
+    private final UserUpdateService userUpdateService;
+
     @Autowired
-    public ApiAuthController(UserService userService, CaptchaService captchaService) {
+    public ApiAuthController(UserService userService, CaptchaService captchaService, UserUpdateService userUpdateService) {
         this.userService = userService;
         this.captchaService = captchaService;
+        this.userUpdateService = userUpdateService;
     }
 
     @GetMapping("/check")
@@ -51,12 +55,12 @@ public class ApiAuthController {
 
     @PostMapping("/restore")
     public PasswordRestoreResponse restore(@RequestBody PasswordRestoreRequest restoreRequest){
-        return userService.passwordRestore(restoreRequest);
+        return userUpdateService.passwordRestore(restoreRequest);
     }
 
     @PostMapping("/password")
     public ChangePasswordResponse changePassword(@RequestBody ChangePasswordRequest request,Principal principal){
-        return userService.changePassword(request,principal.getName());
+        return userUpdateService.changePassword(request,principal.getName());
     }
 
 }

@@ -14,12 +14,19 @@ import main.dto.response.UserUpdateResponse;
 import main.persistence.entity.User;
 import main.persistence.repository.CaptchaRepository;
 import main.persistence.repository.UserRepository;
+import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class UserUpdateService {
@@ -28,14 +35,16 @@ public class UserUpdateService {
     private final SMTP smtp;
     private final PasswordEncoder passwordEncoder;
     private final CaptchaRepository captchaRepository;
+    private final ImageService imageService;
 
     @Autowired
     public UserUpdateService(UserRepository userRepository, SMTP smtp,
-                             PasswordEncoder passwordEncoder, CaptchaRepository captchaRepository) {
+                             PasswordEncoder passwordEncoder, CaptchaRepository captchaRepository, ImageService imageService) {
         this.userRepository = userRepository;
         this.smtp = smtp;
         this.passwordEncoder = passwordEncoder;
         this.captchaRepository = captchaRepository;
+        this.imageService = imageService;
     }
 
 
@@ -95,10 +104,58 @@ public class UserUpdateService {
     }
 
 
-    public UserUpdateResponse updateUser(UserUpdateRequest request){
-        HashMap<String,String> errors = new 
+    public UserUpdateResponse updateUser(UserUpdateRequest request, String email) {
+        HashMap<String, String> errors = updateUserErrors(request,email);
+        if (errors.isEmpty()) {
+            User user = userRepository.findByEmail(email).get();
+            user.setName(request.getName());
+            if (!email.equals(request.getEmail())) {
+                user.setEmail(request.getEmail());
+            }
+            if (request.getPassword() != null) {
+                user.setPassword(passwordEncoder.encode(request.getPassword()));
+            }
+            if (request.getRemovePhoto() != null) {
+                if (request.getRemovePhoto() == 0) {
+                    try {
+                        BufferedImage image = ImageIO.read(request.getPhoto().getInputStream());
+                        image = Scalr.resize(image,36,36);
+                        File file = new File(imageService.randomPath(
+                                request.getPhoto().getOriginalFilename()).toString());
+                        String[] typeSplit = request.getPhoto().getOriginalFilename().split("\\.");
+                        ImageIO.write(image,typeSplit[typeSplit.length-1],file);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return new UserUpdateResponse(false, null);
+                    }
+                } else {
+                    new File(user.getPhoto()).delete();
+                    user.setPhoto("");
+                }
+            }
+            userRepository.save(user);
+            return new UserUpdateResponse(true, null);
+        } else {
+            return new UserUpdateResponse(false, errors);
+        }
     }
 
+    private HashMap<String, String> updateUserErrors(UserUpdateRequest request, String email) {
+        HashMap<String, String> errors = new HashMap<>();
+        if (request.getName().length() < 6) {
+            errors.put("name","Имя указано неверно");
+        }
+        if(userRepository.findByEmail(request.getEmail()).isPresent() && !email.equals(request.getEmail())){
+            errors.put("email","Этот e-mail уже зарегистрирован");
+        }
+        if(request.getPassword() != null){
+            if(request.getPassword().length() < 6){
+                errors.put("password","Пароль короче 6-ти символов");
+            }
+        }
+
+        return errors;
+    }
 
 
 }

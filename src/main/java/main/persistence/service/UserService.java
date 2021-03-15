@@ -1,10 +1,9 @@
 package main.persistence.service;
 
-import com.github.cage.GCage;
 import main.dto.request.AuthRequest;
-import main.dto.request.ChangePasswordRequest;
-import main.dto.request.PasswordRestoreRequest;
-import main.dto.response.*;
+import main.dto.response.AuthResponse;
+import main.dto.response.RegisterDto;
+import main.dto.response.StatisticsResponse;
 import main.persistence.entity.User;
 import main.persistence.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.DigestUtils;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 
 import java.security.Principal;
 import java.util.Date;
@@ -74,6 +68,7 @@ public class UserService {
     }
 
     public AuthResponse login(AuthRequest request) {
+        System.out.println(passwordEncoder.encode(request.getPassword()));
         try {
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
@@ -81,7 +76,7 @@ public class UserService {
             User userInDB = userRepository.findByEmail(request.getEmail()).get();
             long moderationCount = (userInDB.isModerator()) ? postRepository.countOfModeration() : 0;
             return Converter.createAuthResponse(true, userInDB, moderationCount);
-        }catch (BadCredentialsException ex){
+        } catch (BadCredentialsException ex) {
             return Converter.createAuthResponse(false);
         }
     }
@@ -89,7 +84,7 @@ public class UserService {
     public ResponseEntity userRegister(String email, String password, String name, String captcha,
                                        String captchaSecret) {
         RegisterDto registerDto = new RegisterDto();
-        if(settingsRepository.findByCode("MULTIUSER_MODE").get().getValue()) {
+        if (settingsRepository.findByCode("MULTIUSER_MODE").get().getValue()) {
             HashMap<String, String> errors = registerErrors(email, password, name, captcha, captchaSecret);
             if (errors.keySet().size() == 0) {
                 User user = new User();
@@ -106,7 +101,7 @@ public class UserService {
                 registerDto.setErrors(errors);
             }
             return ResponseEntity.ok(registerDto);
-        }else {
+        } else {
             return (ResponseEntity) ResponseEntity.notFound();
         }
     }
@@ -132,26 +127,26 @@ public class UserService {
 
 
     public ResponseEntity getAllStat(String email) {
-        if(!settingsRepository.findByCode("STATISTICS_IS_PUBLIC").get().getValue() &&
+        if (!settingsRepository.findByCode("STATISTICS_IS_PUBLIC").get().getValue() &&
                 !userRepository.findByEmail(email).get().isModerator()) {
-                return (ResponseEntity) ResponseEntity.status(401);
-            }
-            StatisticsResponse statisticsResponse = new StatisticsResponse();
-            long countOfPost = postRepository.count();
-            if (countOfPost > 0) {
-                statisticsResponse.setPostsCount(postRepository.count());
-                statisticsResponse.setViewsCount(postRepository.countViews());
-                statisticsResponse.setLikesCount(votesRepository.countAllByValue(1));
-                statisticsResponse.setDislikesCount(votesRepository.countAllByValue(-1));
-                statisticsResponse.setFirstPublication(postRepository.getFirstPost().getTime() * 1000);
-            } else {
-                statisticsResponse.setPostsCount(0L);
-                statisticsResponse.setViewsCount(0L);
-                statisticsResponse.setLikesCount(0L);
-                statisticsResponse.setDislikesCount(0L);
-                statisticsResponse.setFirstPublication(null);
-            }
-            return ResponseEntity.ok(statisticsResponse);
+            return (ResponseEntity) ResponseEntity.status(401);
+        }
+        StatisticsResponse statisticsResponse = new StatisticsResponse();
+        long countOfPost = postRepository.count();
+        if (countOfPost > 0) {
+            statisticsResponse.setPostsCount(postRepository.count());
+            statisticsResponse.setViewsCount(postRepository.countViews());
+            statisticsResponse.setLikesCount(votesRepository.countAllByValue(1));
+            statisticsResponse.setDislikesCount(votesRepository.countAllByValue(-1));
+            statisticsResponse.setFirstPublication(postRepository.getFirstPost().getTime() * 1000);
+        } else {
+            statisticsResponse.setPostsCount(0L);
+            statisticsResponse.setViewsCount(0L);
+            statisticsResponse.setLikesCount(0L);
+            statisticsResponse.setDislikesCount(0L);
+            statisticsResponse.setFirstPublication(null);
+        }
+        return ResponseEntity.ok(statisticsResponse);
     }
 
     public StatisticsResponse getStatForUser(String email) {
