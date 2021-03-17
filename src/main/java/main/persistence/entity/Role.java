@@ -15,10 +15,6 @@ public enum Role {
         this.permissions = permissions;
     }
 
-    public Set<Permission> getPermissions() {
-        return permissions;
-    }
-
     public Set<SimpleGrantedAuthority> getAuthorities() {
         return permissions.stream()
                 .map(permission -> new SimpleGrantedAuthority(permission.getPermission()))

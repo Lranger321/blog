@@ -1,9 +1,10 @@
 package main.persistence.service;
 
 import com.github.cage.GCage;
-import main.dto.responce.CaptchaResponse;
-import main.persistence.dao.CaptchaDAO;
+import main.dto.response.CaptchaResponse;
 import main.persistence.entity.CaptchaCode;
+import main.persistence.repository.CaptchaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Base64;
@@ -12,10 +13,11 @@ import java.util.Date;
 @Service
 public class CaptchaService {
 
-    private final CaptchaDAO captchaDAO;
+    private final CaptchaRepository captchaRepository;
 
-    public CaptchaService(CaptchaDAO captchaDAO) {
-        this.captchaDAO = captchaDAO;
+    @Autowired
+    public CaptchaService(CaptchaRepository captchaRepository) {
+        this.captchaRepository = captchaRepository;
     }
 
     public CaptchaResponse createCaptcha() {
@@ -37,7 +39,7 @@ public class CaptchaService {
         captchaCode.setCode(code);
         captchaCode.setSecretCode(secretCode);
         captchaCode.setTime(new Date());
-        captchaDAO.saveCaptcha(captchaCode);
+        captchaRepository.save(captchaCode);
     }
 
 }

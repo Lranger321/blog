@@ -17,8 +17,20 @@ public class Vote {
     @Column(nullable = false)
     private Date time;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "post_id", referencedColumnName = "id")
+    private Post post;
+
+    public Post getPost() {
+        return post;
+    }
+
+    public void setPost(Post post) {
+        this.post = post;
+    }
+
     @Column(nullable = false)
-    private Boolean value;
+    private int value;
 
     public int getId() {
         return id;
@@ -44,11 +56,11 @@ public class Vote {
         this.time = time;
     }
 
-    public Boolean getValue() {
+    public int getValue() {
         return value;
     }
 
-    public void setValue(Boolean value) {
+    public void setValue(int value) {
         this.value = value;
     }
 }

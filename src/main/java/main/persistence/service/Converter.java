@@ -1,7 +1,7 @@
 package main.persistence.service;
 
 import com.google.gson.Gson;
-import main.dto.responce.*;
+import main.dto.response.*;
 import main.persistence.entity.Comment;
 import main.persistence.entity.Post;
 import main.persistence.entity.User;
@@ -21,11 +21,11 @@ public class Converter {
             UserDtoResponse user = new UserDtoResponse();
             user.setId(post.getUser().getId());
             user.setName(post.getUser().getName());
-            int likeCount = (int) post.getVotes().stream().filter(Vote::getValue).count();
-            int disLikeCount = (int) post.getVotes().stream().filter(vote -> !vote.getValue()).count();
+            int likeCount = (int) post.getVotes().stream().filter(vote -> vote.getValue()==1).count();
+            int disLikeCount = (int) post.getVotes().stream().filter(vote -> vote.getValue()==-1).count();
             PostDtoResponse postInfo = new PostDtoResponse(post.getId(),
                     post.getTime().getTime() / 1000, user,
-                    post.getTitle(), post.getText(),
+                    post.getTitle(), Jsoup.parse(post.getText()).text(),
                     likeCount, disLikeCount,
                     post.getComments().size(), post.getViewCount());
             responseList.add(postInfo);
@@ -33,7 +33,7 @@ public class Converter {
         return responseList;
     }
 
-    public static PostsInfo convertToPostsInfo(List<PostDtoResponse> posts, int count) {
+    public static PostsInfo convertToPostsInfo(List<PostDtoResponse> posts, long count) {
         PostsInfo postsInfo = new PostsInfo();
         postsInfo.setCount(count);
         postsInfo.setPosts(posts);
@@ -46,7 +46,7 @@ public class Converter {
         return authResponse;
     }
 
-    public static AuthResponse createAuthResponse(Boolean status, User user,int moderationCount) {
+    public static AuthResponse createAuthResponse(Boolean status, User user, long moderationCount) {
         AuthResponse authResponse = new AuthResponse();
         authResponse.setResult(status);
         UserDtoResponse userDtoResponse = new UserDtoResponse();
@@ -66,8 +66,8 @@ public class Converter {
         UserDtoResponse userDtoResponse = new UserDtoResponse();
         userDtoResponse.setName(post.getUser().getName());
         userDtoResponse.setId(post.getUser().getId());
-        int likeCount = (int) post.getVotes().stream().filter(Vote::getValue).count();
-        int disLikeCount = (int) post.getVotes().stream().filter(vote -> !vote.getValue()).count();
+        int likeCount = (int) post.getVotes().stream().filter(vote -> vote.getValue()==1).count();
+        int disLikeCount = (int) post.getVotes().stream().filter(vote -> vote.getValue()==-1).count();
         List<String> tags = new ArrayList<>();
         post.getTagList().forEach(tag -> tags.add(tag.getName()));
         PostViewResponse postViewResponse = new PostViewResponse(

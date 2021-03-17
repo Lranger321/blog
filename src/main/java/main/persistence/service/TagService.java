@@ -1,11 +1,12 @@
 package main.persistence.service;
 
-import main.dto.responce.*;
-import main.dto.responce.TagStorage;
-import main.persistence.dao.PostDAO;
-import main.persistence.dao.TagDAO;
+import main.dto.response.*;
+import main.dto.response.TagStorage;
 import main.persistence.entity.Post;
 import main.persistence.entity.Tag;
+import main.persistence.repository.PostRepository;
+import main.persistence.repository.TagRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -14,19 +15,20 @@ import java.util.List;
 @Service
 public class TagService {
 
-    private final TagDAO tagDAO;
+    private final TagRepository tagRepository;
 
-    private final PostDAO postDAO;
+    private final PostRepository postRepository;
 
-    public TagService(TagDAO tagDAO, PostDAO postDAO) {
-        this.tagDAO = tagDAO;
-        this.postDAO = postDAO;
+    @Autowired
+    public TagService(TagRepository tagRepository, PostRepository postRepository) {
+        this.tagRepository = tagRepository;
+        this.postRepository = postRepository;
     }
 
 
     public TagStorage countAllWeight() {
         TagStorage tagStorage = new TagStorage();
-        tagDAO.getTags().forEach(tag -> {
+        tagRepository.findAll().forEach(tag -> {
             TagInfo tagInfo = new TagInfo();
             tagInfo.setName(tag.getName());
             tagInfo.setWeight(countTagWeight(tag.getName()));
@@ -37,7 +39,7 @@ public class TagService {
 
 
     private Double countTagWeight(String name) {
-        List<Post> posts = postDAO.getPosts("recent", 0, postDAO.getPostCount());
+        List<Post> posts = postRepository.findAll();
         long countOfPosts = posts.size();
         long countOfPostsWithTag = posts.stream()
                 .filter(post -> {
@@ -62,10 +64,10 @@ public class TagService {
 
     private double findMaxWeight() {
         double maxWeight = 0;
-        List<Post> posts = postDAO.getPosts("recent", 0, postDAO.getPostCount());
+        List<Post> posts = postRepository.findAll();
         long countOfPosts = posts.size();
         HashMap<String, Integer> count = new HashMap<>();
-        tagDAO.getTags().forEach(tag -> {
+        tagRepository.findAll().forEach(tag -> {
             count.put(tag.getName(), (int)
                     posts.stream().filter(post -> {
                         boolean containsTag = false;

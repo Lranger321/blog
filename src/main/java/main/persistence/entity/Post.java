@@ -40,15 +40,15 @@ public class Post {
     @Column(name = "view_count",nullable = false)
     private int viewCount;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "post_id", referencedColumnName = "id")
     private List<Vote> votes;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "post_id", referencedColumnName = "id")
     private List<Comment> comments;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "tag2post",joinColumns = {@JoinColumn(name = "tag_id")},
     inverseJoinColumns = {@JoinColumn(name = "post_id")})
     private List<Tag> tagList;

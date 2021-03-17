@@ -1,16 +1,18 @@
 package main.controller;
 
-import main.dto.responce.PostViewResponse;
-import main.dto.responce.PostsInfo;
+import main.dto.request.PostCreateRequest;
+import main.dto.request.VoteRequest;
+import main.dto.response.PostCreateResponse;
+import main.dto.response.PostViewResponse;
+import main.dto.response.PostsInfo;
+import main.dto.response.VoteResponse;
+import main.persistence.service.PostGettingService;
 import main.persistence.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
@@ -20,52 +22,79 @@ public class ApiPostController {
 
     private final PostService postService;
 
+    private final PostGettingService postGettingService;
+
     @Autowired
-    public ApiPostController(PostService postService) {
+    public ApiPostController(PostService postService, PostGettingService postGettingService) {
         this.postService = postService;
+        this.postGettingService = postGettingService;
     }
 
 
     @GetMapping("")
-    public PostsInfo getPosts(int limit, int offset, String mode){
-        System.out.println(offset+"  "+limit);
-        return postService.getPosts(offset,limit,mode);
+    public PostsInfo getPosts(int limit, int offset, String mode) {
+        System.out.println(offset + "  " + limit);
+        return postGettingService.getPosts(offset, limit, mode);
     }
 
     @GetMapping("/byDate")
-    public PostsInfo getPostsByDate(int offset,int limit,String date){
-        return postService.getPostByDate(offset, limit, date);
+    public PostsInfo getPostsByDate(int offset, int limit, String date) {
+        return postGettingService.getPostByDate(offset, limit, date);
     }
 
     @GetMapping("/byTag")
-    public PostsInfo getPostByTag(int offset,int limit,String tag){
-        return postService.getPostByTag(offset,limit,tag);
+    public PostsInfo getPostByTag(int offset, int limit, String tag) {
+        return postGettingService.getPostByTag(offset, limit, tag);
     }
 
     @GetMapping("/search")
     public PostsInfo searchPosts(int offset, int limit, String query) {
-        return postService.searchPosts(offset, limit, query);
+        return postGettingService.searchPosts(offset, limit, query);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PostViewResponse> getPostById(@PathVariable int id){
-        PostViewResponse postViewResponse = postService.getPostById(id);
-        if(postViewResponse == null){
+    public ResponseEntity<PostViewResponse> getPostById(@PathVariable int id) {
+        PostViewResponse postViewResponse = postGettingService.getPostById(id);
+        if (postViewResponse == null) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity(postService.getPostById(id),HttpStatus.OK);
+        return new ResponseEntity(postGettingService.getPostById(id), HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAuthority('user:write')")
+    @PostMapping("")
+    public PostCreateResponse createPost(@RequestBody PostCreateRequest request, Principal principal) {
+        return postService.createPost(request, principal.getName());
     }
 
     @PreAuthorize("hasAuthority('moder:write')")
     @GetMapping("/moderation")
-    public PostsInfo getPostsForModeration(int offset,int limit, String status, Principal principal){
-        return postService.getPostsForModeration(offset,limit,status,principal.getName());
+    public PostsInfo getPostsForModeration(int offset, int limit, String status, Principal principal) {
+        return postGettingService.getPostsForModeration(offset, limit, status, principal.getName());
+    }
+
+    @PreAuthorize("hasAuthority('user:write')")
+    @PutMapping("/{id}")
+    public PostCreateResponse updatePost(@RequestBody PostCreateRequest request, Principal principal,
+                                         @PathVariable int id) {
+        return postService.updatePost(request, id, principal.getName());
     }
 
     @PreAuthorize("hasAuthority('user:write')")
     @GetMapping("/my")
-    public PostsInfo getPostByUser(int offset,int limit, String status, Principal principal){
-        return postService.getPostByUser(offset,limit,status,principal.getName());
+    public PostsInfo getPostByUser(int offset, int limit, String status, Principal principal) {
+        return postGettingService.getPostByUser(offset, limit, status, principal.getName());
     }
 
+    @PreAuthorize("hasAuthority('user:write')")
+    @PostMapping("/like")
+    public VoteResponse likePost(@RequestBody VoteRequest request, Principal principal){
+        return postService.setVote(request,principal.getName(),1);
+    }
+
+    @PreAuthorize("hasAuthority('user:write')")
+    @PostMapping("/dislike")
+    public VoteResponse dislikePost(@RequestBody VoteRequest request, Principal principal){
+        return postService.setVote(request,principal.getName(),-1);
+    }
 }

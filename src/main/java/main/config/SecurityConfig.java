@@ -43,9 +43,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .formLogin().disable()
+                .formLogin()
+                .loginPage("/login").defaultSuccessUrl("/").permitAll().failureUrl("/login").permitAll().and()
                 .logout().permitAll()
-                .logoutUrl("/api/auth/logout").logoutSuccessHandler(logoutSuccessHandler())
+                .logoutUrl("/api/auth/logout").logoutSuccessHandler(logoutSuccessHandler()).deleteCookies("JSESSIONID")
                 .and()
                 .httpBasic();
     }
@@ -57,7 +58,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         daoAuthenticationProvider.setUserDetailsService(userDetailsService);
         return daoAuthenticationProvider;
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
