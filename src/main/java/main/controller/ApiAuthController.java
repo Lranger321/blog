@@ -48,9 +48,8 @@ public class ApiAuthController {
     }
 
     @PostMapping(value = "/register",produces = "application/json")
-    public ResponseEntity userRegister(@RequestBody UserRequest user){
-        return userService.userRegister(user.getEmail(), user.getPassword(), user.getName(), user.getCaptcha(),
-                user.getCaptchaSecret());
+    public RegisterDto userRegister(@RequestBody UserRequest user){
+        return userService.userRegister(user);
     }
 
     @PostMapping("/restore")

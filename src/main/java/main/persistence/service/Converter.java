@@ -16,7 +16,6 @@ public class Converter {
 
     public static List<PostDtoResponse> createPostDtoList(List<Post> posts) {
         List<PostDtoResponse> responseList = new ArrayList<>();
-
         posts.forEach(post -> {
             UserDtoResponse user = new UserDtoResponse();
             user.setId(post.getUser().getId());
@@ -54,6 +53,7 @@ public class Converter {
         userDtoResponse.setName(user.getName());
         userDtoResponse.setModerationCount(moderationCount);
         userDtoResponse.setEmail(user.getEmail());
+        userDtoResponse.setPhoto(user.getPhoto());
         userDtoResponse.setModeration(user.isModerator());
         userDtoResponse.setId(user.getId());
         userDtoResponse.setSettings(true);

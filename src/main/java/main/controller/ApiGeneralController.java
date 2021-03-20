@@ -34,7 +34,8 @@ public class ApiGeneralController {
     @Autowired
     public ApiGeneralController(InitStorage initStorage, SettingsService settingsService,
                                 PostService postService, UserService userService, TagService tagService,
-                                ImageService imageService, PostGettingService postGettingService, UserUpdateService userUpdateService) {
+                                ImageService imageService, PostGettingService postGettingService,
+                                UserUpdateService userUpdateService) {
         this.initStorage = initStorage;
         this.settingsService = settingsService;
         this.postService = postService;
@@ -90,7 +91,7 @@ public class ApiGeneralController {
     }
 
     @GetMapping("/statistics/all")
-    public ResponseEntity getAllStat(Principal principal) {
+    public StatisticsResponse getAllStat(Principal principal) {
         return userService.getAllStat(principal.getName());
     }
 
@@ -102,15 +103,15 @@ public class ApiGeneralController {
 
     @PreAuthorize("hasAuthority('user:write')")
     @RequestMapping(value = "/profile/my", method = RequestMethod.POST,
-            produces = "application/json")
-    public UserUpdateResponse updateUser(@RequestBody UserUpdateRequest request, Principal principal) {
+            consumes = "application/json")
+    public UserUpdateResponse updateUser(@RequestBody UserDeletePhotoRequest request, Principal principal) {
         return userUpdateService.updateUser(request, principal.getName());
     }
 
     @PreAuthorize("hasAuthority('user:write')")
     @RequestMapping(value = "/profile/my", method = RequestMethod.POST,
-            produces = {"multipart/form-data"})
-    public UserUpdateResponse updateUserWithPhoto(@RequestBody UserUpdateRequest request,Principal principal){
+            consumes = {"multipart/form-data;"})
+    public UserUpdateResponse updateUserWithPhoto(@ModelAttribute UserUpdateRequest request,Principal principal){
         System.out.println(principal.getName());
         return userUpdateService.updateUser(request,principal.getName());
     }

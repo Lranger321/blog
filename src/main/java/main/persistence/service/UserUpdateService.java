@@ -1,12 +1,14 @@
 package main.persistence.service;
 
 import com.github.cage.GCage;
+import com.google.gson.Gson;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import main.dto.request.ChangePasswordRequest;
 import main.dto.request.PasswordRestoreRequest;
+import main.dto.request.UserDeletePhotoRequest;
 import main.dto.request.UserUpdateRequest;
 import main.dto.response.ChangePasswordResponse;
 import main.dto.response.PasswordRestoreResponse;
@@ -21,12 +23,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 
 @Service
 public class UserUpdateService {
@@ -103,9 +103,21 @@ public class UserUpdateService {
         return errors;
     }
 
+    public UserUpdateResponse updateUser(UserDeletePhotoRequest request, String email) {
+        System.out.println("UpdateUser : " + new Gson().toJson(request, UserDeletePhotoRequest.class));
+        UserUpdateRequest userUpdateRequest = new UserUpdateRequest();
+        userUpdateRequest.setEmail(request.getEmail());
+        userUpdateRequest.setName(request.getName());
+        userUpdateRequest.setRemovePhoto(request.getRemovePhoto());
+        userUpdateRequest.setPassword(request.getPassword());
+        userUpdateRequest.setPhoto(null);
+        System.out.println("UpdateUser : " + new Gson().toJson(userUpdateRequest, UserUpdateRequest.class));
+        return updateUser(userUpdateRequest, email);
+    }
+
 
     public UserUpdateResponse updateUser(UserUpdateRequest request, String email) {
-        HashMap<String, String> errors = updateUserErrors(request,email);
+        HashMap<String, String> errors = updateUserErrors(request, email);
         if (errors.isEmpty()) {
             User user = userRepository.findByEmail(email).get();
             user.setName(request.getName());
@@ -118,18 +130,14 @@ public class UserUpdateService {
             if (request.getRemovePhoto() != null) {
                 if (request.getRemovePhoto() == 0) {
                     try {
-                        BufferedImage image = ImageIO.read(request.getPhoto().getInputStream());
-                        image = Scalr.resize(image,36,36);
-                        File file = new File(imageService.randomPath(
-                                request.getPhoto().getOriginalFilename()).toString());
-                        String[] typeSplit = request.getPhoto().getOriginalFilename().split("\\.");
-                        ImageIO.write(image,typeSplit[typeSplit.length-1],file);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        return new UserUpdateResponse(false, null);
+                        uploadPhoto(request, user);
+                    } catch (IOException exception) {
+                        exception.printStackTrace();
                     }
                 } else {
-                    new File(user.getPhoto()).delete();
+                    StringBuilder path = new StringBuilder(user.getPhoto());
+                    path.deleteCharAt(0);
+                    new File(path.toString()).delete();
                     user.setPhoto("");
                 }
             }
@@ -143,18 +151,33 @@ public class UserUpdateService {
     private HashMap<String, String> updateUserErrors(UserUpdateRequest request, String email) {
         HashMap<String, String> errors = new HashMap<>();
         if (request.getName().length() < 6) {
-            errors.put("name","Имя указано неверно");
+            errors.put("name", "Имя указано неверно");
         }
-        if(userRepository.findByEmail(request.getEmail()).isPresent() && !email.equals(request.getEmail())){
-            errors.put("email","Этот e-mail уже зарегистрирован");
+        if (userRepository.findByEmail(request.getEmail()).isPresent() && !email.equals(request.getEmail())) {
+            errors.put("email", "Этот e-mail уже зарегистрирован");
         }
-        if(request.getPassword() != null){
-            if(request.getPassword().length() < 6){
-                errors.put("password","Пароль короче 6-ти символов");
+        if (request.getPassword() != null) {
+            if (request.getPassword().length() < 6) {
+                errors.put("password", "Пароль короче 6-ти символов");
             }
         }
 
         return errors;
+    }
+
+    private void uploadPhoto(UserUpdateRequest request, User user) throws IOException {
+        BufferedImage image = ImageIO.read(request.getPhoto().getInputStream());
+        image = Scalr.resize(image, 36, 36);
+        String path = imageService.randomPath(
+                request.getPhoto().getOriginalFilename()).toString();
+        System.out.println(path);
+        File file = new File(path);
+        file.createNewFile();
+        String[] typeSplit = request.getPhoto().getOriginalFilename().split("\\.");
+        ImageIO.write(image, typeSplit[typeSplit.length - 1], file);
+        path = "/" + path.replaceAll("\\\\", "/");
+        System.out.println(path);
+        user.setPhoto(path);
     }
 
 

@@ -8,22 +8,16 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Integer> {
 
-    Post findById(Long id);
-
-    @Query("SELECT count(p) FROM Post p where p.text like concat('%',:search_text,'%')")
-    long countByText(@Param("search_text") String Text);
+    Optional<Post> findById(Long id);
 
     @Query("SELECT count(p) FROM Post p where p.moderationStatus='NEW' AND p.isActive=true")
     long countOfModeration();
 
-    @Query("SELECT count(p) FROM Post p WHERE p.user.email = :email AND p.isActive=true " +
-            "AND p.moderationStatus=:moderation_status")
-    long countOfPostByUserAndModerationStatus(@Param("moderation_status") ModerationStatus status,
-                                              @Param("email") String name);
     @Query("SELECT sum(p.viewCount) FROM Post p")
     long countViews();
 
