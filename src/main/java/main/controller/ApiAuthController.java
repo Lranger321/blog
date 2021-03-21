@@ -43,12 +43,14 @@ public class ApiAuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request){
+        System.out.println(request);
        AuthResponse authResponse = userService.login(request);
         return ResponseEntity.ok(authResponse);
     }
 
-    @PostMapping(value = "/register",produces = "application/json")
+    @PostMapping(value = "/register")
     public RegisterDto userRegister(@RequestBody UserRequest user){
+        System.out.println(user);
         return userService.userRegister(user);
     }
 

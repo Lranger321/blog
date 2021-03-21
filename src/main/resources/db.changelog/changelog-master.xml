@@ -7,7 +7,7 @@
 
     <property name="now" value="NOW()" dbms="mysql"/>
 
- <!---   <changeSet author="root" id="changelog-1.0" runAlways="false">
+   <changeSet author="root" id="changelog-1.0" runAlways="false">
         <createTable tableName="users">
             <column name="id" type="int" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true"/>
@@ -290,5 +290,4 @@
             <column name="view_count" value="0"/>
         </insert>
     </changeSet>
--->
 </databaseChangeLog>
