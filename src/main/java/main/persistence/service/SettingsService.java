@@ -8,7 +8,6 @@ import main.persistence.repository.GlobalSettingsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-//todo убрать DAO
 @Service
 public class SettingsService {
 

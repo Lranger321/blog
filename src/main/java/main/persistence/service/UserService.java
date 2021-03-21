@@ -1,13 +1,16 @@
 package main.persistence.service;
 
 import main.dto.request.AuthRequest;
+import main.dto.request.UserRequest;
 import main.dto.response.AuthResponse;
 import main.dto.response.RegisterDto;
 import main.dto.response.StatisticsResponse;
+import main.persistence.entity.CaptchaCode;
 import main.persistence.entity.User;
+import main.persistence.exceptions.ForbiddenException;
+import main.persistence.exceptions.NotFoundException;
 import main.persistence.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.security.Principal;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -81,44 +85,45 @@ public class UserService {
         }
     }
 
-    public ResponseEntity userRegister(String email, String password, String name, String captcha,
-                                       String captchaSecret) {
+    public RegisterDto userRegister(UserRequest request) {
         RegisterDto registerDto = new RegisterDto();
         if (settingsRepository.findByCode("MULTIUSER_MODE").get().getValue()) {
-            HashMap<String, String> errors = registerErrors(email, password, name, captcha, captchaSecret);
+            HashMap<String, String> errors = registerErrors(request);
             if (errors.keySet().size() == 0) {
                 User user = new User();
-                user.setEmail(email);
+                user.setEmail(request.getEmail());
                 user.setModerator(false);
-                user.setName(name);
+                user.setName(request.getName());
                 user.setRegTime(new Date());
-                user.setPassword(passwordEncoder.encode(password));
-                user.setCode(captchaSecret);
+                user.setPassword(passwordEncoder.encode(request.getPassword()));
+                user.setCode(null);
                 userRepository.save(user);
                 registerDto.setResult(true);
             } else {
                 registerDto.setResult(false);
                 registerDto.setErrors(errors);
             }
-            return ResponseEntity.ok(registerDto);
-        } else {
-            return (ResponseEntity) ResponseEntity.notFound();
+            return registerDto;
         }
+        throw new NotFoundException();
     }
 
-    private HashMap<String, String> registerErrors(String email, String password, String name, String captcha,
-                                                   String captchaSecret) {
+    private HashMap<String, String> registerErrors(UserRequest request) {
         HashMap<String, String> errors = new HashMap<>();
-        if (!userRepository.findByEmail(email).isPresent()) {
+        if (!userRepository.findByEmail(request.getEmail()).isPresent()) {
             errors.put("e_mail", "Этот e-mail уже зарегистрирован");
         }
-        if (password.length() < 6) {
+        if (request.getPassword().length() < 6) {
             errors.put("password", "Пароль короче 6-ти символов");
         }
-        if (!captchaRepository.findBySecretCode(captchaSecret).get().getCode().equals(captcha)) {
-            errors.put("captcha", "Код с картинки введён неверно");
+        Optional<CaptchaCode> captcha = captchaRepository.findBySecretCode(request.getCaptchaSecret());
+        if (captcha.isPresent()) {
+            String secretCode = captcha.get().getSecretCode();
+            if (!secretCode.equals(request.getCaptcha())) {
+                errors.put("captcha", "Код с картинки введён неверно");
+            }
         }
-        if (name.length() < 3) {
+        if (request.getName().length() < 3) {
             errors.put("name", "Имя указано неверно");
         }
         System.out.println(errors.keySet().size());
@@ -126,10 +131,10 @@ public class UserService {
     }
 
 
-    public ResponseEntity getAllStat(String email) {
+    public StatisticsResponse getAllStat(String email) {
         if (!settingsRepository.findByCode("STATISTICS_IS_PUBLIC").get().getValue() &&
                 !userRepository.findByEmail(email).get().isModerator()) {
-            return (ResponseEntity) ResponseEntity.status(401);
+            throw new ForbiddenException();
         }
         StatisticsResponse statisticsResponse = new StatisticsResponse();
         long countOfPost = postRepository.count();
@@ -146,7 +151,7 @@ public class UserService {
             statisticsResponse.setDislikesCount(0L);
             statisticsResponse.setFirstPublication(null);
         }
-        return ResponseEntity.ok(statisticsResponse);
+        return statisticsResponse;
     }
 
     public StatisticsResponse getStatForUser(String email) {

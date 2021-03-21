@@ -12,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.attribute.UserPrincipalNotFoundException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class PostService {
@@ -48,11 +45,13 @@ public class PostService {
     }
 
     public PostCreateResponse updatePost(PostCreateRequest request, long id, String email) {
-        Post post = postRepository.findById(id);
-        if (post.getUser().getEmail().equals(email)) {
-            return new PostCreateResponse(false, null);
+        Optional<Post> post = postRepository.findById(id);
+        if(post.isPresent()) {
+            if (post.get().getUser().getEmail().equals(email)) {
+                return new PostCreateResponse(false, null);
+            }
         }
-        return savePost(post, request, email);
+        return savePost(post.get(), request, email);
     }
 
     public PostCreateResponse createPost(PostCreateRequest request, String email) {
@@ -115,13 +114,16 @@ public class PostService {
         CommentCreateResponse response = new CommentCreateResponse();
         HashMap<String, String> errors = createCommentErrors(commentCreateRequest);
         if (errors.keySet().isEmpty()) {
-            Post post = postRepository.findById(commentCreateRequest.getPostId());
-            Comment comment = entityConverter.createComment(commentCreateRequest, email, post);
-            List<Comment> comments = post.getComments();
-            comments.add(comment);
-            post.setComments(comments);
-            response.setId(commentRepository.save(comment).getId());
-            postRepository.save(post);
+            Optional<Post> optionalPost = postRepository.findById(commentCreateRequest.getPostId());
+            if(optionalPost.isPresent()) {
+                Post post = optionalPost.get();
+                Comment comment = entityConverter.createComment(commentCreateRequest, email, post);
+                List<Comment> comments = post.getComments();
+                comments.add(comment);
+                post.setComments(comments);
+                response.setId(commentRepository.save(comment).getId());
+                postRepository.save(post);
+            }
         } else {
             response.setResult(false);
             response.setErrors(errors);
@@ -130,10 +132,11 @@ public class PostService {
     }
 
     public ModerationResponse moderation(ModerationRequest request, String email) {
-        Post post = postRepository.findById(request.getPostId());
-        User moderator = userRepository.findByEmail(email).orElse(null);
-        System.out.println(post + " " + moderator);
-        if (post != null && moderator != null) {
+        Optional<Post> postOptional = postRepository.findById(request.getPostId());
+        Optional<User> moderatorOptional = userRepository.findByEmail(email);
+        if (postOptional.isPresent() && moderatorOptional.isPresent()) {
+            Post post = postOptional.get();
+            User moderator = moderatorOptional.get();
             switch (request.getDecision()) {
                 case "new":
                     post.setModerationStatus(ModerationStatus.NEW);
@@ -169,16 +172,19 @@ public class PostService {
             e.printStackTrace();
             return new VoteResponse(false);
         }
-        Post post = postRepository.findById(request.getPostId()).orElse(null);
-        Vote vote = votesRepository.findVoteByPostAndUser(email, post.getId()).orElse(new Vote());
-        vote.setTime(new Date());
-        vote.setValue(value);
-        vote.setUser(user);
-        vote.setPost(post);
-        List votes = post.getVotes();
-        votes.add(votesRepository.save(vote));
-        post.setVotes(votes);
-        postRepository.save(post);
+        Optional<Post> postOptional = postRepository.findById(request.getPostId());
+        if(postOptional.isPresent()) {
+            Post post = postOptional.get();
+            Vote vote = votesRepository.findVoteByPostAndUser(email, post.getId()).orElse(new Vote());
+            vote.setTime(new Date());
+            vote.setValue(value);
+            vote.setUser(user);
+            vote.setPost(post);
+            List votes = post.getVotes();
+            votes.add(votesRepository.save(vote));
+            post.setVotes(votes);
+            postRepository.save(post);
+        }
         return new VoteResponse(true);
     }
 

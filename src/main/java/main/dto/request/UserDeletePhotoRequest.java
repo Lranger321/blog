@@ -1,10 +1,9 @@
 package main.dto.request;
 
 import lombok.Data;
-import org.springframework.web.multipart.MultipartFile;
 
 @Data
-public class UserUpdateRequest {
+public class UserDeletePhotoRequest {
 
     private String name;
 
@@ -12,7 +11,7 @@ public class UserUpdateRequest {
 
     private String password;
 
-    private MultipartFile photo;
+    private String photo;
 
     private Integer removePhoto;
 
