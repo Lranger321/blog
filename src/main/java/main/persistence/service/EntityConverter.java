@@ -35,7 +35,7 @@ public class EntityConverter {
     public Comment createComment(CommentCreateRequest commentCreateRequest, String email,Post post) {
         Comment comment = new Comment();
         if (commentCreateRequest.getParentId() != null) {
-            comment.setParent(commentRepository.findById(commentCreateRequest.getParentId()).orElse(null));
+            comment.setParent(commentRepository.findById(Integer.valueOf(commentCreateRequest.getParentId())).orElse(null));
         }
         comment.setUser(userRepository.findByEmail(email)
                 .orElseThrow(()->new UsernameNotFoundException("User not found")));

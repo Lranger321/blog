@@ -18,6 +18,6 @@ public interface VotesRepository extends JpaRepository<Vote, Integer> {
     List<Long> countVotes(@Param("value") int value, @Param("email") String email);
 
     @Query("FROM Vote v WHERE v.user.email=:email AND v.post.id=:post_id")
-    Optional<Vote> findVoteByPostAndUser(@Param("email")String email,@Param("post_id") int postId);
+    Optional<Vote> findVoteByPostAndUser(@Param("email")String email,@Param("post_id") long postId);
 
 }
