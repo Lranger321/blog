@@ -90,6 +90,7 @@ public class UserService {
         if (settingsRepository.findByCode("MULTIUSER_MODE").get().getValue()) {
             HashMap<String, String> errors = registerErrors(request);
             if (errors.keySet().size() == 0) {
+                System.out.println("Register user");
                 User user = new User();
                 user.setEmail(request.getEmail());
                 user.setModerator(false);
@@ -97,7 +98,8 @@ public class UserService {
                 user.setRegTime(new Date());
                 user.setPassword(passwordEncoder.encode(request.getPassword()));
                 user.setCode(null);
-                userRepository.save(user);
+               // userRepository.save(user);
+                System.out.println(userRepository.save(user));
                 registerDto.setResult(true);
             } else {
                 registerDto.setResult(false);
@@ -110,7 +112,7 @@ public class UserService {
 
     private HashMap<String, String> registerErrors(UserRequest request) {
         HashMap<String, String> errors = new HashMap<>();
-        if (!userRepository.findByEmail(request.getEmail()).isPresent()) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             errors.put("e_mail", "Этот e-mail уже зарегистрирован");
         }
         if (request.getPassword().length() < 6) {
@@ -118,7 +120,7 @@ public class UserService {
         }
         Optional<CaptchaCode> captcha = captchaRepository.findBySecretCode(request.getCaptchaSecret());
         if (captcha.isPresent()) {
-            String secretCode = captcha.get().getSecretCode();
+            String secretCode = captcha.get().getCode();
             if (!secretCode.equals(request.getCaptcha())) {
                 errors.put("captcha", "Код с картинки введён неверно");
             }
