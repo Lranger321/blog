@@ -98,7 +98,7 @@ public class UserService {
                 user.setRegTime(new Date());
                 user.setPassword(passwordEncoder.encode(request.getPassword()));
                 user.setCode(null);
-               // userRepository.save(user);
+                // userRepository.save(user);
                 System.out.println(userRepository.save(user));
                 registerDto.setResult(true);
             } else {
@@ -133,10 +133,16 @@ public class UserService {
     }
 
 
-    public StatisticsResponse getAllStat(String email) {
-        if (!settingsRepository.findByCode("STATISTICS_IS_PUBLIC").get().getValue() &&
-                !userRepository.findByEmail(email).get().isModerator()) {
-            throw new ForbiddenException();
+    public StatisticsResponse getAllStat(Principal principal) {
+        if (!settingsRepository.findByCode("STATISTICS_IS_PUBLIC").get().getValue()) {
+            if (principal != null) {
+                if (!userRepository.findByEmail(principal.getName()).get().isModerator()) {
+                    throw new ForbiddenException();
+                }
+            } else {
+                throw new ForbiddenException();
+            }
+
         }
         StatisticsResponse statisticsResponse = new StatisticsResponse();
         long countOfPost = postRepository.count();
