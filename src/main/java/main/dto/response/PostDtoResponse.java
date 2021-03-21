@@ -9,7 +9,7 @@ import lombok.Data;
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 public class PostDtoResponse {
 
-    private int id;
+    private long id;
 
     private long timestamp;
 

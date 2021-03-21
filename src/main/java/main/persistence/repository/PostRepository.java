@@ -15,7 +15,7 @@ import java.util.Optional;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Integer> {
 
-    Optional<Post> findById(Long id);
+    Optional<Post> findById(long Id);
 
     @Query("SELECT count(p) FROM Post p where p.moderationStatus='NEW' AND p.isActive=true")
     long countOfModeration();

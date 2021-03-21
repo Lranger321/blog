@@ -11,7 +11,7 @@ public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     @Column(name = "is_active",nullable = false)
     private Boolean isActive;
@@ -53,11 +53,11 @@ public class Post {
     inverseJoinColumns = {@JoinColumn(name = "post_id")})
     private List<Tag> tagList;
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
