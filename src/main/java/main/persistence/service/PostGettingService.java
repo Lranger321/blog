@@ -5,6 +5,8 @@ import main.dto.response.PostViewResponse;
 import main.dto.response.PostsInfo;
 import main.persistence.entity.ModerationStatus;
 import main.persistence.entity.Post;
+import main.persistence.entity.PostCalendar;
+import main.persistence.repository.CalendarRepository;
 import main.persistence.repository.PostPageRepository;
 import main.persistence.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +30,14 @@ public class PostGettingService {
 
     private final PostPageRepository postPageRepository;
 
+    private final CalendarRepository calendarRepository;
+
     @Autowired
-    public PostGettingService(PostRepository postRepository, PostPageRepository postPageRepository) {
+    public PostGettingService(PostRepository postRepository, PostPageRepository postPageRepository,
+                              CalendarRepository calendarRepository) {
         this.postRepository = postRepository;
         this.postPageRepository = postPageRepository;
+        this.calendarRepository = calendarRepository;
     }
 
     public PostsInfo getPostsForModeration(int offset, int limit, String status, String userName) {
@@ -166,23 +172,12 @@ public class PostGettingService {
     }
 
     //todo toBd
-    public CalendarInfo getCalendar(String inputYear) {
+    public CalendarInfo getCalendar(Integer inputYear) {
         if (inputYear == null) {
-            inputYear = dateFormat.format(new Date()).split("-")[0];
+            inputYear = Integer.valueOf(dateFormat.format(new Date()).split("-")[0]);
         }
-        List<Integer> years = new ArrayList<>();
-        HashMap<String, Integer> postsCalendar = new HashMap<>();
-        String finalInputYear = inputYear;
-        postRepository.findAll().forEach(post -> {
-            String date = dateFormat.format(post.getTime());
-            int year = Integer.parseInt(date.split("-")[0]);
-            if (!years.contains(year)) {
-                years.add(year);
-            }
-            if (Integer.toString(year).equals(finalInputYear)) {
-                postsCalendar.put(date, postsCalendar.getOrDefault(date, 0) + 1);
-            }
-        });
+        List<Integer> years = calendarRepository.getYears();
+        List<PostCalendar> postsCalendar = calendarRepository.getCalendar(inputYear);
         return Converter.createCalendarInfo(postsCalendar, years);
     }
 

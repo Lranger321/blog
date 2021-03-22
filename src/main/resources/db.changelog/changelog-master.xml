@@ -290,4 +290,5 @@
             <column name="view_count" value="0"/>
         </insert>
     </changeSet>
+    
 </databaseChangeLog>

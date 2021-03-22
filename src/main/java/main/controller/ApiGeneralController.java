@@ -57,7 +57,7 @@ public class ApiGeneralController {
     }
 
     @GetMapping("/calendar")
-    public CalendarInfo getCalendar(String year) {
+    public CalendarInfo getCalendar(Integer year) {
         return postGettingService.getCalendar(year);
     }
 
