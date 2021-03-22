@@ -19,7 +19,14 @@ public interface PostPageRepository extends PagingAndSortingRepository<Post, Int
     @Query("FROM Post p WHERE p.isActive=true AND p.moderationStatus='ACCEPTED' AND p.isActive=true ORDER BY p.comments.size DESC ")
     Page<Post> sortedByComments(Pageable pageable);
 
-    @Query("FROM Post p where p.isActive=true AND p.moderationStatus='ACCEPTED' order by p.votes.size desc")
+    @Query("SELECT p " +
+            "FROM Post p " +
+            "LEFT JOIN User u ON u.id = p.user.id " +
+            "LEFT JOIN Vote pvl on pvl.post.id = p.id and pvl.value = 1 " +
+            "WHERE p.isActive = true AND p.moderationStatus = 'ACCEPTED' AND p.time <= current_date " +
+            "GROUP BY p.id " +
+            "ORDER BY COUNT(pvl) DESC"
+    )
     Page<Post> sortedByLikes(Pageable pageable);
 
     //List<Post> findAllByIsActiveAndModerationStatusOrderByVotes();
