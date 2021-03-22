@@ -8,9 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Optional;
+import java.awt.*;
+import java.util.*;
+import java.util.List;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Integer> {
@@ -25,15 +25,6 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     @Query("select min(p.time) FROM Post p")
     Date getFirstPost();
-
-    //todo to JPQL
-    @Query(value = "SELECT posts.time, count(posts.id) FROM posts " +
-            "where posts.is_active = true AND posts.moderation_status='ACCEPTED'" +
-            "GROUP BY DATE(posts.time)",nativeQuery = true)
-    PostCalendar getCalendar();
-
-    //@Query()
-   // PostCalendar getCalendarByYear(Date year);
 
     @Query("select min(p.time) FROM Post p where p.user.email=:email")
     Date getFirstPost(@Param("email") String email);

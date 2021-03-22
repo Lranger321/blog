@@ -2,17 +2,18 @@ package main.persistence.service;
 
 import com.google.gson.Gson;
 import main.dto.response.*;
-import main.persistence.entity.Comment;
-import main.persistence.entity.Post;
-import main.persistence.entity.User;
-import main.persistence.entity.Vote;
+import main.persistence.entity.*;
 import org.jsoup.Jsoup;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class Converter {
+
+    private static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     public static List<PostDtoResponse> createPostDtoList(List<Post> posts) {
         List<PostDtoResponse> responseList = new ArrayList<>();
@@ -85,9 +86,13 @@ public class Converter {
         return postViewResponse;
     }
 
-    public static CalendarInfo createCalendarInfo(HashMap<String, Integer> postsCalendar,List<Integer> years){
+    public static CalendarInfo createCalendarInfo(List<PostCalendar> postsCalendar, List<Integer> years){
         CalendarInfo calendarInfo = new CalendarInfo();
-        calendarInfo.setPosts(postsCalendar);
+        HashMap<String,Long> posts = new HashMap<>();
+        postsCalendar.forEach(postCalendar -> {
+            posts.put(dateFormat.format(postCalendar.getDate()),postCalendar.getCount());
+        });
+        calendarInfo.setPosts(posts);
         calendarInfo.setYears(years);
         return calendarInfo;
     }

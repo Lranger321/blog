@@ -64,8 +64,9 @@ public class PostService {
         User user = userRepository.findByEmail(email).orElse(null);
         System.out.println(errors);
         if (errors == null && user != null) {
-            post.setActive(request.isActive());
+            post.setActive(request.getActive() == 1);
             post.setUser(user);
+            //troubles with time stamp
             post.setTime(new Date(request.getTimestamp() / 1000));
             post.setTagList(createTagList(request.getTags()));
             post.setTitle(request.getTitle());

@@ -57,7 +57,7 @@ public class ApiGeneralController {
     }
 
     @GetMapping("/calendar")
-    public CalendarInfo getCalendar(String year) {
+    public CalendarInfo getCalendar(Integer year) {
         return postGettingService.getCalendar(year);
     }
 
@@ -92,7 +92,7 @@ public class ApiGeneralController {
 
     @GetMapping("/statistics/all")
     public StatisticsResponse getAllStat(Principal principal) {
-        return userService.getAllStat(principal.getName());
+        return userService.getAllStat(principal);
     }
 
     @PreAuthorize("hasAnyAuthority('moder:wrtite')")

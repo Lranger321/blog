@@ -10,6 +10,6 @@ public class CalendarInfo {
 
     List<Integer> years;
 
-    HashMap<String, Integer> posts;
+    HashMap<String, Long> posts;
     
 }

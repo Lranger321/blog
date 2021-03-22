@@ -9,7 +9,7 @@ import java.util.List;
 @AllArgsConstructor
 public class PostCreateRequest {
     private long timestamp;
-    private boolean active;
+    private int active;
     private List<String> tags;
     private String text;
     private String title;
