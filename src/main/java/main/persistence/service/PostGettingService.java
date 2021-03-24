@@ -116,7 +116,6 @@ public class PostGettingService {
                 pagePosts = (postPageRepository.sortedByComments(pageable));
                 break;
             //- сортировать по убыванию количества лайков (посты без лайков дизлайков выводить)
-            // Todo соритирует по кол-во лайков и дизлайков
             case "best":
                 pageable = PageRequest.of(offset, limit);
                 pagePosts = (postPageRepository.sortedByLikes(pageable));

@@ -16,20 +16,19 @@ public interface PostPageRepository extends PagingAndSortingRepository<Post, Int
     Page<Post> findAllByIsActiveAndModerationStatus
             (Boolean active, ModerationStatus moderation, Pageable pageable);
 
-    @Query("FROM Post p WHERE p.isActive=true AND p.moderationStatus='ACCEPTED' AND p.isActive=true ORDER BY p.comments.size DESC ")
+    @Query("SELECT p FROM Post p " +
+            "WHERE p.isActive=true AND " +
+            "p.moderationStatus='ACCEPTED' AND " +
+            "p.isActive=true ORDER BY p.comments.size DESC ")
     Page<Post> sortedByComments(Pageable pageable);
 
-    @Query("SELECT p " +
-            "FROM Post p " +
-            "LEFT JOIN User u ON u.id = p.user.id " +
-            "LEFT JOIN Vote pvl on pvl.post.id = p.id and pvl.value = 1 " +
-            "WHERE p.isActive = true AND p.moderationStatus = 'ACCEPTED' AND p.time <= current_date " +
+    @Query("SELECT p FROM Post p " +
+            "JOIN fetch Vote v on v.post.id = p.id and v.value = 1 " +
+            "WHERE p.isActive = true AND p.moderationStatus = 'ACCEPTED'" +
             "GROUP BY p.id " +
-            "ORDER BY COUNT(pvl) DESC"
+            "ORDER BY COUNT(v) DESC"
     )
     Page<Post> sortedByLikes(Pageable pageable);
-
-    //List<Post> findAllByIsActiveAndModerationStatusOrderByVotes();
 
     @Query("FROM Post p where p.text like concat('%',:search_text,'%') and p.isActive=true")
     Page<Post> searchByText(Pageable page, @Param("search_text") String Text);
@@ -52,6 +51,10 @@ public interface PostPageRepository extends PagingAndSortingRepository<Post, Int
     @Query("select p FROM Post p inner join p.tagList t where p.isActive=true AND t.name=:tag_name order by p.viewCount")
     Page<Post> findPostsByTag(Pageable pageable, @Param("tag_name") String tagName);
 
-    @Query("FROM Post p where p.isActive=true AND p.time > :from_date AND p.time < :to_date order by p.viewCount")
+    @Query("FROM Post p" +
+            " where p.isActive=true AND " +
+            "p.moderationStatus='ACCEPTED' " +
+            "AND p.time > :from_date AND " +
+            "p.time < :to_date order by p.viewCount")
     Page<Post> findPostByDate(Pageable pageable, @Param("from_date") Date date, @Param("to_date") Date toDate);
 }

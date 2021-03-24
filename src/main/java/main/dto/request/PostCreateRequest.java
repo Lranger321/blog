@@ -1,12 +1,10 @@
 package main.dto.request;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-@AllArgsConstructor
 public class PostCreateRequest {
     private long timestamp;
     private int active;
