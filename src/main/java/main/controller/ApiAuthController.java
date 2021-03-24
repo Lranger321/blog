@@ -42,10 +42,8 @@ public class ApiAuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request){
-        System.out.println(request);
-       AuthResponse authResponse = userService.login(request);
-        return ResponseEntity.ok(authResponse);
+    public AuthResponse login(@RequestBody AuthRequest request){
+       return userService.login(request);
     }
 
     @PostMapping(value = "/register")

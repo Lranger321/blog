@@ -23,8 +23,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query("SELECT sum(p.viewCount) FROM Post p")
     long countViews();
 
-    @Query("select min(p.time) FROM Post p")
-    Date getFirstPost();
+    Post findFirstByOrderByTimeDesc();
 
     @Query("select min(p.time) FROM Post p where p.user.email=:email")
     Date getFirstPost(@Param("email") String email);

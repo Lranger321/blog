@@ -95,7 +95,7 @@ public class ApiGeneralController {
         return userService.getAllStat(principal);
     }
 
-    @PreAuthorize("hasAnyAuthority('moder:wrtite')")
+    @PreAuthorize("hasAnyAuthority('moder:write')")
     @PutMapping("/settings")
     public SetSettingsResponse setSettings(@RequestBody SetSettingsRequest request) {
         return settingsService.setSettings(request);

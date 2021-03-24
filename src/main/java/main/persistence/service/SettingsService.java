@@ -21,12 +21,16 @@ public class SettingsService {
     public SettingsResponse getSettings() {
         SettingsResponse response = new SettingsResponse();
         repository.findAll().forEach(setting -> {
-            if (setting.getCode().equals("STATISTICS_IS_PUBLIC")) {
-                response.setStatisticsIsPublic(setting.getValue());
-            } else if (setting.getCode().equals("MULTIUSER_MODE")) {
-                response.setMultiUserMode(setting.getValue());
-            } else if (setting.getCode().equals("POST_PREMODERATION")) {
-                response.setMultiUserMode(setting.getValue());
+            switch (setting.getCode()) {
+                case "STATISTICS_IS_PUBLIC":
+                    response.setStatisticsIsPublic(setting.getValue());
+                    break;
+                case "MULTIUSER_MODE":
+                    response.setMultiUserMode(setting.getValue());
+                    break;
+                case "POST_PREMODERATION":
+                    response.setPostPreModeration(setting.getValue());
+                    break;
             }
         });
         return response;

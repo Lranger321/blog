@@ -72,7 +72,6 @@ public class UserService {
     }
 
     public AuthResponse login(AuthRequest request) {
-        System.out.println(passwordEncoder.encode(request.getPassword()));
         try {
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
@@ -151,7 +150,8 @@ public class UserService {
             statisticsResponse.setViewsCount(postRepository.countViews());
             statisticsResponse.setLikesCount(votesRepository.countAllByValue(1));
             statisticsResponse.setDislikesCount(votesRepository.countAllByValue(-1));
-            statisticsResponse.setFirstPublication(postRepository.getFirstPost().getTime() * 1000);
+            statisticsResponse.setFirstPublication(postRepository.findFirstByOrderByTimeDesc()
+                    .getTime().getTime() / 1000);
         } else {
             statisticsResponse.setPostsCount(0L);
             statisticsResponse.setViewsCount(0L);

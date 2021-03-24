@@ -33,7 +33,6 @@ public class ApiPostController {
 
     @GetMapping("")
     public PostsInfo getPosts(int limit, int offset, String mode) {
-        System.out.println(offset + "  " + limit);
         return postGettingService.getPosts(offset, limit, mode);
     }
 
@@ -88,13 +87,13 @@ public class ApiPostController {
 
     @PreAuthorize("hasAuthority('user:write')")
     @PostMapping("/like")
-    public VoteResponse likePost(@RequestBody VoteRequest request, Principal principal){
-        return postService.setVote(request,principal.getName(),1);
+    public VoteResponse likePost(@RequestBody VoteRequest request, Principal principal) {
+        return postService.setVote(request, principal.getName(), 1);
     }
 
     @PreAuthorize("hasAuthority('user:write')")
     @PostMapping("/dislike")
-    public VoteResponse dislikePost(@RequestBody VoteRequest request, Principal principal){
-        return postService.setVote(request,principal.getName(),-1);
+    public VoteResponse dislikePost(@RequestBody VoteRequest request, Principal principal) {
+        return postService.setVote(request, principal.getName(), -1);
     }
 }

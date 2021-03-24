@@ -5,6 +5,7 @@ import main.dto.response.*;
 import main.persistence.entity.*;
 import org.jsoup.Jsoup;
 
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class Converter {
             int likeCount = (int) post.getVotes().stream().filter(vote -> vote.getValue()==1).count();
             int disLikeCount = (int) post.getVotes().stream().filter(vote -> vote.getValue()==-1).count();
             PostDtoResponse postInfo = new PostDtoResponse(post.getId(),
-                    post.getTime().getTime() / 1000, user,
+                    post.getTime().getTime()/1000, user,
                     post.getTitle(), Jsoup.parse(post.getText()).text(),
                     likeCount, disLikeCount,
                     post.getComments().size(), post.getViewCount());
@@ -73,7 +74,7 @@ public class Converter {
         post.getTagList().forEach(tag -> tags.add(tag.getName()));
         PostViewResponse postViewResponse = new PostViewResponse(
                 post.getId(),
-                post.getTime().getTime() / 1000,
+                post.getTime().getTime(),
                 userDtoResponse,
                 post.getTitle(),
                 Jsoup.parse(post.getText()).text(),
