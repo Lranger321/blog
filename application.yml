@@ -5,6 +5,10 @@ spring.jpa.hibernate.ddl-auto: none
 spring.datasource.hikari.maxLifeTime: 60000
 server.port: ${PORT:8080}
 
+spring.main.eager-initialization: true
+upload.path: /app/upload\
+
+
 spring.liquibase.enabled: true
 spring.liquibase.change-log: classpath:db.changelog\changelog-master.xml
 spring.jackson.serialization-inclusion: non_null
