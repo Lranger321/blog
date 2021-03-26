@@ -172,6 +172,7 @@ public class UserUpdateService {
                 request.getPhoto().getOriginalFilename()).toString();
         System.out.println(path);
         File file = new File(path);
+        System.out.println(file.getAbsolutePath());
         file.createNewFile();
         String[] typeSplit = request.getPhoto().getOriginalFilename().split("\\.");
         ImageIO.write(image, typeSplit[typeSplit.length - 1], file);

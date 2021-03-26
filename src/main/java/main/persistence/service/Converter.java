@@ -90,9 +90,10 @@ public class Converter {
     public static CalendarInfo createCalendarInfo(List<PostCalendar> postsCalendar, List<Integer> years){
         CalendarInfo calendarInfo = new CalendarInfo();
         HashMap<String,Long> posts = new HashMap<>();
-        postsCalendar.forEach(postCalendar -> {
+        System.out.println("post"+postsCalendar.get(0).getDate());
+        for(PostCalendar postCalendar : postsCalendar){
             posts.put(dateFormat.format(postCalendar.getDate()),postCalendar.getCount());
-        });
+        }
         calendarInfo.setPosts(posts);
         calendarInfo.setYears(years);
         return calendarInfo;

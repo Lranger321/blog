@@ -1,20 +1,11 @@
 package main.persistence.entity;
 
-import lombok.Data;
-
-import javax.persistence.Entity;
-import javax.persistence.Id;
 import java.util.Date;
 
-@Data
-@Entity
-public class PostCalendar  {
+public interface PostCalendar {
 
-    @Id
-    private int id;
+    Date getDate();
 
-    private Date date;
-
-    private long count;
+    long getCount();
 
 }

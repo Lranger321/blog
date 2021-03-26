@@ -2,6 +2,7 @@ package main.persistence.service;
 
 import main.dto.response.*;
 import main.dto.response.TagStorage;
+import main.persistence.entity.ModerationStatus;
 import main.persistence.entity.Post;
 import main.persistence.entity.Tag;
 import main.persistence.repository.PostRepository;
@@ -39,7 +40,7 @@ public class TagService {
 
 
     private Double countTagWeight(String name) {
-        List<Post> posts = postRepository.findAll();
+        List<Post> posts = postRepository.findAllByIsActiveAndModerationStatus(true, ModerationStatus.ACCEPTED);
         long countOfPosts = posts.size();
         long countOfPostsWithTag = posts.stream()
                 .filter(post -> {

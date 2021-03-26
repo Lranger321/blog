@@ -23,6 +23,8 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query("SELECT sum(p.viewCount) FROM Post p")
     long countViews();
 
+    List<Post> findAllByIsActiveAndModerationStatus(boolean Active,ModerationStatus moderationStatus);
+
     Post findFirstByOrderByTimeDesc();
 
     @Query("select min(p.time) FROM Post p where p.user.email=:email")
