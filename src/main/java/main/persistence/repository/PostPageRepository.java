@@ -23,7 +23,7 @@ public interface PostPageRepository extends PagingAndSortingRepository<Post, Int
     Page<Post> sortedByComments(Pageable pageable);
 
     @Query("SELECT p FROM Post p " +
-            "JOIN fetch Vote v on v.post.id = p.id and v.value = 1 " +
+            "LEFT JOIN Vote v on v.post.id = p.id and v.value = 1 " +
             "WHERE p.isActive = true AND p.moderationStatus = 'ACCEPTED'" +
             "GROUP BY p.id " +
             "ORDER BY COUNT(v) DESC"

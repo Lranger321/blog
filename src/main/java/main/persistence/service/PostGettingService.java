@@ -136,7 +136,7 @@ public class PostGettingService {
     }
 
     public PostsInfo getPostByDate(int offset, int limit, String date) {
-        Page<Post> pagePosts = null;
+        Page<Post> pagePosts;
         Pageable pageable = PageRequest.of(offset, offset + limit);
         try {
             Calendar calendar = Calendar.getInstance();
@@ -145,6 +145,7 @@ public class PostGettingService {
             pagePosts = postPageRepository.findPostByDate(pageable, dateFormat.parse(date), calendar.getTime());
         } catch (ParseException e) {
             e.printStackTrace();
+            return null;
         }
         long count = pagePosts.getTotalElements();
         return Converter.convertToPostsInfo(
@@ -175,8 +176,16 @@ public class PostGettingService {
         if (inputYear == null) {
             inputYear = Integer.valueOf(dateFormat.format(new Date()).split("-")[0]);
         }
+        String fromDate = inputYear+"-01-01";
+        String toDate = inputYear+"-12-31";
         List<Integer> years = calendarRepository.getYears();
-        List<PostCalendar> postsCalendar = calendarRepository.getCalendar(inputYear);
+        List<PostCalendar> postsCalendar = null;
+        try {
+            postsCalendar = calendarRepository.getCalendar(dateFormat.parse(fromDate),dateFormat.parse(toDate));
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
         return Converter.createCalendarInfo(postsCalendar, years);
     }
 
