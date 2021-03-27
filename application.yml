@@ -6,7 +6,7 @@ spring.datasource.hikari.maxLifeTime: 60000
 server.port: ${PORT:8080}
 
 spring.main.eager-initialization: true
-upload.path: /app/upload\
+upload.path: /app/upload/
 
 
 spring.liquibase.enabled: true
