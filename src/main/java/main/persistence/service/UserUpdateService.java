@@ -53,17 +53,15 @@ public class UserUpdateService {
         User user = userRepository.findByEmail(email).orElse(null);
         if (user != null) {
             String token = DigestUtils.md5DigestAsHex(new GCage().getTokenGenerator().next().getBytes());
-            System.out.println(token);
             String url = "127.0.0.1:8080/login/change-password/" + token;
             try {
-                HttpResponse<JsonNode> request = Unirest.post(smtp.getUrl() + "/messages")
+                Unirest.post(smtp.getUrl() + "/messages")
                         .basicAuth("api", smtp.getPassword())
                         .queryString("from", smtp.getEmail())
                         .queryString("to", email)
                         .queryString("subject", "PubBlog restore password")
                         .queryString("text", url)
                         .asJson();
-                System.out.println(request.getBody());
             } catch (UnirestException e) {
                 e.printStackTrace();
                 return null;
@@ -104,14 +102,12 @@ public class UserUpdateService {
     }
 
     public UserUpdateResponse updateUser(UserDeletePhotoRequest request, String email) {
-        System.out.println("UpdateUser : " + new Gson().toJson(request, UserDeletePhotoRequest.class));
         UserUpdateRequest userUpdateRequest = new UserUpdateRequest();
         userUpdateRequest.setEmail(request.getEmail());
         userUpdateRequest.setName(request.getName());
         userUpdateRequest.setRemovePhoto(request.getRemovePhoto());
         userUpdateRequest.setPassword(request.getPassword());
         userUpdateRequest.setPhoto(null);
-        System.out.println("UpdateUser : " + new Gson().toJson(userUpdateRequest, UserUpdateRequest.class));
         return updateUser(userUpdateRequest, email);
     }
 
@@ -170,14 +166,12 @@ public class UserUpdateService {
         image = Scalr.resize(image, 36, 36);
         String path = imageService.randomPath(
                 request.getPhoto().getOriginalFilename()).toString();
-        System.out.println(path);
         File file = new File(path);
         System.out.println(file.getAbsolutePath());
         file.createNewFile();
         String[] typeSplit = request.getPhoto().getOriginalFilename().split("\\.");
         ImageIO.write(image, typeSplit[typeSplit.length - 1], file);
         path = "/" + path.replaceAll("\\\\", "/");
-        System.out.println(path);
         user.setPhoto(path);
     }
 
