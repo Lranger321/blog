@@ -89,7 +89,6 @@ public class UserService {
         if (settingsRepository.findByCode("MULTIUSER_MODE").get().getValue()) {
             HashMap<String, String> errors = registerErrors(request);
             if (errors.keySet().size() == 0) {
-                System.out.println("Register user");
                 User user = new User();
                 user.setEmail(request.getEmail());
                 user.setModerator(false);
@@ -98,7 +97,6 @@ public class UserService {
                 user.setPassword(passwordEncoder.encode(request.getPassword()));
                 user.setCode(null);
                 // userRepository.save(user);
-                System.out.println(userRepository.save(user));
                 registerDto.setResult(true);
             } else {
                 registerDto.setResult(false);
@@ -127,7 +125,6 @@ public class UserService {
         if (request.getName().length() < 3) {
             errors.put("name", "Имя указано неверно");
         }
-        System.out.println(errors.keySet().size());
         return errors;
     }
 
@@ -165,6 +162,7 @@ public class UserService {
     public StatisticsResponse getStatForUser(String email) {
         StatisticsResponse statisticsResponse = new StatisticsResponse();
         long countOfPost = postRepository.countPost(email);
+        statisticsResponse.setPostsCount(countOfPost);
         statisticsResponse.setPostsCount(countOfPost);
         if (countOfPost > 0) {
             statisticsResponse.setLikesCount(votesRepository.countVotes(1, email)
