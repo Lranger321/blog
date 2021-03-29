@@ -1,11 +1,12 @@
 package main.persistence.service;
 
-import com.google.gson.Gson;
 import main.dto.response.*;
-import main.persistence.entity.*;
+import main.persistence.entity.Comment;
+import main.persistence.entity.Post;
+import main.persistence.entity.PostCalendar;
+import main.persistence.entity.User;
 import org.jsoup.Jsoup;
 
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import java.util.List;
 
 public class Converter {
 
-    private static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     public static List<PostDtoResponse> createPostDtoList(List<Post> posts) {
         List<PostDtoResponse> responseList = new ArrayList<>();
@@ -22,13 +23,19 @@ public class Converter {
             UserDtoResponse user = new UserDtoResponse();
             user.setId(post.getUser().getId());
             user.setName(post.getUser().getName());
-            int likeCount = (int) post.getVotes().stream().filter(vote -> vote.getValue()==1).count();
-            int disLikeCount = (int) post.getVotes().stream().filter(vote -> vote.getValue()==-1).count();
-            PostDtoResponse postInfo = new PostDtoResponse(post.getId(),
-                    post.getTime().getTime()/1000, user,
-                    post.getTitle(), Jsoup.parse(post.getText()).text(),
-                    likeCount, disLikeCount,
-                    post.getComments().size(), post.getViewCount());
+            int likeCount = (int) post.getVotes().stream().filter(vote -> vote.getValue() == 1).count();
+            int disLikeCount = (int) post.getVotes().stream().filter(vote -> vote.getValue() == -1).count();
+            PostDtoResponse postInfo = PostDtoResponse.builder()
+                    .id(post.getId())
+                    .timestamp(post.getTime().getTime() / 1000)
+                    .user(user)
+                    .title(post.getTitle())
+                    .announce(Jsoup.parse(post.getText()).text())
+                    .likeCount(likeCount)
+                    .dislikeCount(disLikeCount)
+                    .commentCount(post.getComments().size())
+                    .viewCount(post.getViewCount())
+                    .build();
             responseList.add(postInfo);
         });
         return responseList;
@@ -50,17 +57,16 @@ public class Converter {
     public static AuthResponse createAuthResponse(Boolean status, User user, long moderationCount) {
         AuthResponse authResponse = new AuthResponse();
         authResponse.setResult(status);
-        UserDtoResponse userDtoResponse = new UserDtoResponse();
-        userDtoResponse.setId(user.getId());
-        userDtoResponse.setName(user.getName());
-        userDtoResponse.setModerationCount(moderationCount);
-        userDtoResponse.setEmail(user.getEmail());
-        userDtoResponse.setPhoto(user.getPhoto());
-        userDtoResponse.setModeration(user.isModerator());
-        userDtoResponse.setId(user.getId());
-        userDtoResponse.setSettings(true);
+        UserDtoResponse userDtoResponse = UserDtoResponse.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .moderationCount(moderationCount)
+                .email(user.getEmail())
+                .photo(user.getPhoto())
+                .moderation(user.isModerator())
+                .settings(true)
+                .build();
         authResponse.setUser(userDtoResponse);
-        System.out.println(new Gson().toJson(authResponse,AuthResponse.class));
         return authResponse;
     }
 
@@ -68,31 +74,30 @@ public class Converter {
         UserDtoResponse userDtoResponse = new UserDtoResponse();
         userDtoResponse.setName(post.getUser().getName());
         userDtoResponse.setId(post.getUser().getId());
-        int likeCount = (int) post.getVotes().stream().filter(vote -> vote.getValue()==1).count();
-        int disLikeCount = (int) post.getVotes().stream().filter(vote -> vote.getValue()==-1).count();
+        int likeCount = (int) post.getVotes().stream().filter(vote -> vote.getValue() == 1).count();
+        int disLikeCount = (int) post.getVotes().stream().filter(vote -> vote.getValue() == -1).count();
         List<String> tags = new ArrayList<>();
         post.getTagList().forEach(tag -> tags.add(tag.getName()));
-        PostViewResponse postViewResponse = new PostViewResponse(
-                post.getId(),
-                post.getTime().getTime(),
-                userDtoResponse,
-                post.getTitle(),
-                Jsoup.parse(post.getText()).text(),
-                likeCount,
-                disLikeCount,
-                post.getViewCount(),
-                commentInfos(post.getComments()),
-                tags
-        );
+        PostViewResponse postViewResponse = PostViewResponse.builder()
+                .id(post.getId())
+                .timestamp(post.getTime().getTime() / 1000)
+                .user(userDtoResponse)
+                .title(post.getTitle())
+                .text(post.getText())
+                .likeCount(likeCount)
+                .dislikeCount(disLikeCount)
+                .viewCount(post.getViewCount())
+                .comments(commentInfos(post.getComments()))
+                .tags(tags)
+                .build();
         return postViewResponse;
     }
 
-    public static CalendarInfo createCalendarInfo(List<PostCalendar> postsCalendar, List<Integer> years){
+    public static CalendarInfo createCalendarInfo(List<PostCalendar> postsCalendar, List<Integer> years) {
         CalendarInfo calendarInfo = new CalendarInfo();
-        HashMap<String,Long> posts = new HashMap<>();
-        System.out.println("post"+postsCalendar.get(0).getDate());
-        for(PostCalendar postCalendar : postsCalendar){
-            posts.put(dateFormat.format(postCalendar.getDate()),postCalendar.getCount());
+        HashMap<String, Long> posts = new HashMap<>();
+        for (PostCalendar postCalendar : postsCalendar) {
+            posts.put(dateFormat.format(postCalendar.getDate()), postCalendar.getCount());
         }
         calendarInfo.setPosts(posts);
         calendarInfo.setYears(years);
@@ -102,19 +107,21 @@ public class Converter {
     private static List<CommentInfo> commentInfos(List<Comment> comments) {
         List<CommentInfo> commentInfos = new ArrayList<>();
         comments.forEach(comment -> {
-            UserDtoResponse user = new UserDtoResponse();
-            user.setName(comment.getUser().getName());
-            user.setId(comment.getUser().getId());
-            user.setPhoto(comment.getUser().getPhoto());
-           CommentInfo commentInfo = new CommentInfo(comment.getId(),
-                    comment.getTime().getTime() / 1000,
-                    comment.getText(), user);
+            UserDtoResponse user = UserDtoResponse.builder()
+                    .name(comment.getUser().getName())
+                    .id(comment.getUser().getId())
+                    .photo(comment.getUser().getPhoto())
+                    .build();
+            CommentInfo commentInfo = CommentInfo.builder()
+                    .id(comment.getId())
+                    .timestamp(comment.getTime().getTime() / 1000)
+                    .text(comment.getText())
+                    .user(user)
+                    .build();
             commentInfos.add(commentInfo);
-           commentInfos.add(commentInfo);
         });
         return commentInfos;
     }
-
 
 
 }

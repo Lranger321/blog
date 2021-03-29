@@ -1,20 +1,24 @@
 package main.persistence.service;
 
+import lombok.RequiredArgsConstructor;
 import main.dto.request.CommentCreateRequest;
 import main.dto.request.ModerationRequest;
 import main.dto.request.PostCreateRequest;
 import main.dto.request.VoteRequest;
-import main.dto.response.*;
+import main.dto.response.CommentCreateResponse;
+import main.dto.response.ModerationResponse;
+import main.dto.response.PostCreateResponse;
+import main.dto.response.VoteResponse;
 import main.persistence.entity.*;
 import main.persistence.repository.*;
 import org.jsoup.Jsoup;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.attribute.UserPrincipalNotFoundException;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class PostService {
 
     private final TagRepository tagRepository;
@@ -31,23 +35,11 @@ public class PostService {
 
     private final GlobalSettingsRepository settingsRepository;
 
-    @Autowired
-    public PostService(TagRepository tagRepository, PostRepository postRepository,
-                       UserRepository userRepository, CommentRepository commentRepository,
-                       EntityConverter entityConverter, VotesRepository votesRepository, GlobalSettingsRepository settingsRepository) {
-        this.tagRepository = tagRepository;
-        this.postRepository = postRepository;
-        this.userRepository = userRepository;
-        this.commentRepository = commentRepository;
-        this.entityConverter = entityConverter;
-        this.votesRepository = votesRepository;
-        this.settingsRepository = settingsRepository;
-    }
-
     public PostCreateResponse updatePost(PostCreateRequest request, long id, String email) {
         Optional<Post> post = postRepository.findById(id);
-        if(post.isPresent()) {
-            if (post.get().getUser().getEmail().equals(email)) {
+        if (post.isPresent()) {
+            User userWhoUpdate = userRepository.findByEmail(email).get();
+            if (!post.get().getUser().getEmail().equals(email) && !userWhoUpdate.isModerator()) {
                 return new PostCreateResponse(false, null);
             }
         }
@@ -62,18 +54,17 @@ public class PostService {
         HashMap<String, String> errors = getPostCreateErrors(request);
         boolean result = false;
         User user = userRepository.findByEmail(email).orElse(null);
-        System.out.println(errors);
         if (errors == null && user != null) {
-            post.setActive(request.getActive() == 1);
+            System.out.println(request);
+            post.setIsActive(request.getActive() == 1);
             post.setUser(user);
-            //troubles with time stamp
-            post.setTime(new Date(request.getTimestamp() / 1000));
+            post.setTime(new Date(request.getTimestamp() * 1000));
             post.setTagList(createTagList(request.getTags()));
             post.setTitle(request.getTitle());
             post.setText(request.getText());
-            if(settingsRepository.findByCode("POST_PREMODERATION").get().getValue()) {
+            if (settingsRepository.findByCode("POST_PREMODERATION").get().getValue()) {
                 post.setModerationStatus(ModerationStatus.NEW);
-            }else{
+            } else {
                 post.setModerationStatus(ModerationStatus.ACCEPTED);
             }
             postRepository.save(post);
@@ -87,8 +78,9 @@ public class PostService {
         for (String name : tags) {
             Tag tag = tagRepository.findByName(name).orElse(null);
             if (tag == null) {
-                tag = new Tag();
-                tag.setName(name);
+                tag = Tag.builder()
+                        .name(name)
+                        .build();
                 tagRepository.save(tag);
                 tag = tagRepository.findByName(name).get();
             }
@@ -105,6 +97,7 @@ public class PostService {
         if (Jsoup.parse(request.getText()).text().length() < 20) {
             errors.put("text", "Текст публикации слишком короткий");
         }
+        System.out.println(errors);
         if (errors.keySet().isEmpty()) {
             return null;
         }
@@ -116,7 +109,7 @@ public class PostService {
         HashMap<String, String> errors = createCommentErrors(commentCreateRequest);
         if (errors.keySet().isEmpty()) {
             Optional<Post> optionalPost = postRepository.findById(commentCreateRequest.getPostId());
-            if(optionalPost.isPresent()) {
+            if (optionalPost.isPresent()) {
                 Post post = optionalPost.get();
                 Comment comment = entityConverter.createComment(commentCreateRequest, email, post);
                 List<Comment> comments = post.getComments();
@@ -174,7 +167,7 @@ public class PostService {
             return new VoteResponse(false);
         }
         Optional<Post> postOptional = postRepository.findById(request.getPostId());
-        if(postOptional.isPresent()) {
+        if (postOptional.isPresent()) {
             Post post = postOptional.get();
             Vote vote = votesRepository.findVoteByPostAndUser(email, post.getId()).orElse(new Vote());
             vote.setTime(new Date());

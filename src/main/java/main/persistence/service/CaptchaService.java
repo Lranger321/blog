@@ -20,13 +20,13 @@ public class CaptchaService {
         this.captchaRepository = captchaRepository;
     }
 
+
     public CaptchaResponse createCaptcha() {
         CaptchaResponse captchaResponse = new CaptchaResponse();
         GCage gCage = new GCage();
         String token = gCage.getTokenGenerator().next();
         String secretCode = gCage.getTokenGenerator().next();
         String image = Base64.getEncoder().encodeToString(gCage.draw(token));
-        System.out.println(secretCode+":"+token);
         saveCaptcha(token, secretCode);
         image = "data:image/png;base64," + image;
         captchaResponse.setImage(image);
@@ -35,10 +35,10 @@ public class CaptchaService {
     }
 
     private void saveCaptcha(String code, String secretCode) {
-        CaptchaCode captchaCode = new CaptchaCode();
-        captchaCode.setCode(code);
-        captchaCode.setSecretCode(secretCode);
-        captchaCode.setTime(new Date());
+        CaptchaCode captchaCode = CaptchaCode.builder()
+                .code(code)
+                .secretCode(secretCode)
+                .time(new Date()).build();
         captchaRepository.save(captchaCode);
     }
 

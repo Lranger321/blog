@@ -25,9 +25,9 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     List<Post> findAllByIsActiveAndModerationStatus(boolean Active,ModerationStatus moderationStatus);
 
-    Post findFirstByOrderByTimeDesc();
+    Post findFirstByOrderByTimeAsc();
 
-    @Query("select min(p.time) FROM Post p where p.user.email=:email")
+    @Query("select MIN(p.time) FROM Post p where p.user.email=:email")
     Date getFirstPost(@Param("email") String email);
 
     @Query("SELECT sum(p.viewCount) FROM Post p where p.user.email=:email")

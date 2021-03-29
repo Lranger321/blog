@@ -89,14 +89,15 @@ public class UserService {
         if (settingsRepository.findByCode("MULTIUSER_MODE").get().getValue()) {
             HashMap<String, String> errors = registerErrors(request);
             if (errors.keySet().size() == 0) {
-                User user = new User();
-                user.setEmail(request.getEmail());
-                user.setModerator(false);
-                user.setName(request.getName());
-                user.setRegTime(new Date());
-                user.setPassword(passwordEncoder.encode(request.getPassword()));
-                user.setCode(null);
-                // userRepository.save(user);
+                User user = User.builder()
+                        .email(request.getEmail())
+                        .isModerator(false)
+                        .name(request.getName())
+                        .regTime(new Date())
+                        .password(passwordEncoder.encode(request.getPassword()))
+                        .code(null)
+                        .build();
+                userRepository.save(user);
                 registerDto.setResult(true);
             } else {
                 registerDto.setResult(false);
@@ -147,7 +148,7 @@ public class UserService {
             statisticsResponse.setViewsCount(postRepository.countViews());
             statisticsResponse.setLikesCount(votesRepository.countAllByValue(1));
             statisticsResponse.setDislikesCount(votesRepository.countAllByValue(-1));
-            statisticsResponse.setFirstPublication(postRepository.findFirstByOrderByTimeDesc()
+            statisticsResponse.setFirstPublication(postRepository.findFirstByOrderByTimeAsc()
                     .getTime().getTime() / 1000);
         } else {
             statisticsResponse.setPostsCount(0L);
@@ -170,7 +171,7 @@ public class UserService {
             statisticsResponse.setDislikesCount(votesRepository.countVotes(-1, email)
                     .stream().mapToLong(e -> e).sum());
             statisticsResponse.setViewsCount(postRepository.countViews(email));
-            statisticsResponse.setFirstPublication(postRepository.getFirstPost(email).getTime() * 1000);
+            statisticsResponse.setFirstPublication(postRepository.getFirstPost(email).getTime() / 1000);
         } else {
             statisticsResponse.setLikesCount(0L);
             statisticsResponse.setDislikesCount(0L);
