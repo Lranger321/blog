@@ -2,12 +2,13 @@ package main.dto.response;
 
 import java.util.List;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
-@Data
-@AllArgsConstructor(access = AccessLevel.PUBLIC)
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PostViewResponse {
 
     private long id;

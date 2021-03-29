@@ -171,7 +171,6 @@ public class PostGettingService {
         return postViewResponse;
     }
 
-    //todo toBd
     public CalendarInfo getCalendar(Integer inputYear) {
         if (inputYear == null) {
             inputYear = Integer.valueOf(dateFormat.format(new Date()).split("-")[0]);

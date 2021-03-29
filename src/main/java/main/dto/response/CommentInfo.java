@@ -1,12 +1,13 @@
 package main.dto.response;
 
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
-@Data
-@AllArgsConstructor(access = AccessLevel.PUBLIC)
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CommentInfo {
 
     private long id;
