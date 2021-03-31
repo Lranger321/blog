@@ -414,4 +414,8 @@
         </insert>
     </changeSet>
 
+    <changeSet id="Change textTo" author="root">
+        <modifyDataType tableName="posts" columnName="text" newDataType="text"/>
+    </changeSet>
+
 </databaseChangeLog>
