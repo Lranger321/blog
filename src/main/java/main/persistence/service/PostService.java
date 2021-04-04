@@ -11,6 +11,7 @@ import main.dto.response.PostCreateResponse;
 import main.dto.response.VoteResponse;
 import main.persistence.entity.*;
 import main.persistence.repository.*;
+import main.persistence.service.converters.EntityConverter;
 import org.jsoup.Jsoup;
 import org.springframework.stereotype.Service;
 

@@ -1,57 +1,53 @@
 package main.persistence.service;
 
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.util.IOUtils;
 import main.dto.response.ImageResponse;
-import org.springframework.beans.factory.annotation.Value;
+import main.persistence.service.constants.AmazonClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.Random;
 
 @Service
+//todo From local to AWS3
 public class ImageService {
+
+    private final AmazonS3 s3Client;
+
+    private final AmazonClient amazonClient;
+
+    @Autowired
+    public ImageService(AmazonClient amazonClient) {
+        this.amazonClient = amazonClient;
+        BasicAWSCredentials credentials = new BasicAWSCredentials(amazonClient.getAccessKey(), amazonClient.getSecretKey());
+        System.out.println("Amazon:"+amazonClient.getAccessKey() +"   "+amazonClient.getSecretKey()+"  "+amazonClient.getBucketName());
+        this.s3Client = AmazonS3ClientBuilder.standard()
+                .withRegion(amazonClient.getRegion())
+                .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                .build();
+    }
 
     public ResponseEntity saveImage(MultipartFile file) {
         HashMap<String, String> errors = errors(file);
         if (errors.isEmpty()) {
-            try {
-                Path path = randomPath(file.getOriginalFilename());
-                Files.write(path, file.getBytes());
-                return ResponseEntity.ok(randomPath(path.toString()));
-            } catch (IOException e) {
-                e.printStackTrace();
-                return ResponseEntity.ok(new ImageResponse(false, errors));
-            }
+            System.out.println("try save");
+            String path = uploadFile(file);
+            return ResponseEntity.ok(path);
         }
         return ResponseEntity.ok(new ImageResponse(false, errors));
-    }
-
-    public Path randomPath(String originalName) {
-        StringBuilder builder = new StringBuilder();
-        String firstFilePath = randomString();
-        String secondFilePath = randomString();
-        File firstFile = new File("upload\\" + firstFilePath);
-        if (!firstFile.exists()) {
-            firstFile.mkdir();
-        }
-        File secondFile = new File("upload\\" + firstFilePath + "\\" + secondFilePath);
-        if (!secondFile.exists()) {
-            secondFile.mkdir();
-        }
-        builder.append("upload\\")
-                .append(firstFilePath)
-                .append("\\")
-                .append(secondFilePath)
-                .append("\\")
-                .append(originalName);
-        Path filePath = Paths.get(builder.toString());
-        return filePath;
     }
 
     private HashMap<String, String> errors(MultipartFile image) {
@@ -66,11 +62,47 @@ public class ImageService {
         return errors;
     }
 
-    private String randomString() {
-        return new Random().ints(97, 122)
-                .limit(2)
-                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-                .toString();
+    public String uploadFile(MultipartFile multipartFile) {
+        String fileUrl = "";
+        try {
+            File file = convertMultiPartToFile(multipartFile);
+            String fileName = generateFileName(multipartFile);
+            fileUrl = "/upload/" + fileName.hashCode();
+            uploadFileTos3bucket(String.valueOf(fileName.hashCode()), file);
+            file.delete();
+        } catch (AmazonClientException | IOException ex) {
+            ex.printStackTrace();
+        }
+        return fileUrl;
+
     }
 
+    private File convertMultiPartToFile(MultipartFile file) throws IOException {
+        File toFile = new File(file.getOriginalFilename());
+        FileOutputStream fos = new FileOutputStream(toFile);
+        fos.write(file.getBytes());
+        fos.close();
+        return toFile;
+    }
+
+    private void uploadFileTos3bucket(String fileName, File file) {
+        s3Client.putObject(amazonClient.getBucketName(), fileName, file);
+        //.withCannedAcl(CannedAccessControlList.PublicRead));
+    }
+
+    private String generateFileName(MultipartFile multiPart) {
+        return new Date().getTime() + "-" + multiPart.getOriginalFilename().replace(" ", "_");
+    }
+
+    public byte[] getImage(String fileName) {
+        System.out.println(fileName);
+        S3Object s3Object = s3Client.getObject(amazonClient.getBucketName(),fileName);
+        S3ObjectInputStream inputStream = s3Object.getObjectContent();
+        try {
+            return IOUtils.toByteArray(inputStream);
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+        return null;
+    }
 }

@@ -10,6 +10,8 @@ import main.persistence.entity.User;
 import main.persistence.exceptions.ForbiddenException;
 import main.persistence.exceptions.NotFoundException;
 import main.persistence.repository.*;
+import main.persistence.service.constants.SMTP;
+import main.persistence.service.converters.Converter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;

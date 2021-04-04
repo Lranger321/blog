@@ -1,9 +1,6 @@
 package main.persistence.service;
 
 import com.github.cage.GCage;
-import com.google.gson.Gson;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import main.dto.request.ChangePasswordRequest;
@@ -16,16 +13,19 @@ import main.dto.response.UserUpdateResponse;
 import main.persistence.entity.User;
 import main.persistence.repository.CaptchaRepository;
 import main.persistence.repository.UserRepository;
+import main.persistence.service.constants.SMTP;
+import org.apache.http.entity.ContentType;
 import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 
 @Service
@@ -164,14 +164,15 @@ public class UserUpdateService {
     private void uploadPhoto(UserUpdateRequest request, User user) throws IOException {
         BufferedImage image = ImageIO.read(request.getPhoto().getInputStream());
         image = Scalr.resize(image, 36, 36);
-        String path = imageService.randomPath(
-                request.getPhoto().getOriginalFilename()).toString();
-        File file = new File(path);
-        System.out.println(file.getAbsolutePath());
-        file.createNewFile();
         String[] typeSplit = request.getPhoto().getOriginalFilename().split("\\.");
-        ImageIO.write(image, typeSplit[typeSplit.length - 1], file);
-        path = "/" + path.replaceAll("\\\\", "/");
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(image, typeSplit[typeSplit.length - 1], baos );
+        baos.flush();
+        InputStream inputStream = new ByteArrayInputStream(baos.toByteArray());
+        MultipartFile file = new MockMultipartFile(
+                request.getPhoto().getName(),request.getPhoto().getOriginalFilename(),
+                ContentType.APPLICATION_OCTET_STREAM.toString(), inputStream);
+        String path = imageService.uploadFile(file);
         user.setPhoto(path);
     }
 
