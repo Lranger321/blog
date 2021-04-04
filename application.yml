@@ -6,8 +6,7 @@ spring.datasource.hikari.maxLifeTime: 60000
 server.port: ${PORT:8080}
 
 spring.main.eager-initialization: true
-upload.path: /app/upload/
-
+upload.path: D:\blog\upload\
 
 spring.liquibase.enabled: true
 spring.liquibase.change-log: classpath:db.changelog\changelog-master.xml
@@ -19,6 +18,12 @@ spring.servlet.multipart.max-request-size: 128KB
 mail.password: 74c114b8844644c661cc708121715675-29561299-4b0f8a9e
 mail.url: https://api.mailgun.net/v3/sandboxcad921fc99ff4cc39294759a39a46899.mailgun.org
 mail.fromMail: k.nikitaigorevich@gmail.com
+
+amazonProperties.accessKey: AKIA4KJKUN6MX72LUR63
+amazonProperties.secretKey: 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
+amazonProperties.bucketName: blog-diplom
+amazonProperties.region: us-east-1
+
 
 blog.title: DevPub
 blog.subtitle: Рассказы разработчиков

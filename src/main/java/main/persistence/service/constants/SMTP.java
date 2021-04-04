@@ -1,4 +1,4 @@
-package main.persistence.service;
+package main.persistence.service.constants;
 
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;

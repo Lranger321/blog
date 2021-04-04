@@ -1,4 +1,4 @@
-package main.persistence.service;
+package main.persistence.service.converters;
 
 import main.dto.response.*;
 import main.persistence.entity.Comment;

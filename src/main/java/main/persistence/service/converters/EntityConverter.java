@@ -1,10 +1,9 @@
-package main.persistence.service;
+package main.persistence.service.converters;
 
 import main.dto.request.CommentCreateRequest;
 import main.persistence.entity.Comment;
 import main.persistence.entity.Post;
 import main.persistence.repository.CommentRepository;
-import main.persistence.repository.TagRepository;
 import main.persistence.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,13 +18,10 @@ public class EntityConverter {
 
     private final UserRepository userRepository;
 
-    private final TagRepository tagRepository;
-
     @Autowired
-    public EntityConverter(CommentRepository commentRepository, UserRepository userRepository, TagRepository tagRepository) {
+    public EntityConverter(CommentRepository commentRepository, UserRepository userRepository) {
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
-        this.tagRepository = tagRepository;
     }
 
 
