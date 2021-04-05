@@ -131,9 +131,8 @@ public class UserUpdateService {
                         exception.printStackTrace();
                     }
                 } else {
-                    StringBuilder path = new StringBuilder(user.getPhoto());
-                    path.deleteCharAt(0);
-                    new File(path.toString()).delete();
+                    System.out.println("Photo: "+user.getPhoto().split("/",3)[2]);
+                    imageService.deleteFileFromBucket(user.getPhoto().split("/",2)[1]);
                     user.setPhoto("");
                 }
             }
