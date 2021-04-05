@@ -22,7 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 
 @Service
-//todo From local to AWS3
 public class ImageService {
 
     private final AmazonS3 s3Client;
@@ -33,7 +32,6 @@ public class ImageService {
     public ImageService(AmazonClient amazonClient) {
         this.amazonClient = amazonClient;
         BasicAWSCredentials credentials = new BasicAWSCredentials(amazonClient.getAccessKey(), amazonClient.getSecretKey());
-        System.out.println("Amazon:"+amazonClient.getAccessKey() +"   "+amazonClient.getSecretKey()+"  "+amazonClient.getBucketName());
         this.s3Client = AmazonS3ClientBuilder.standard()
                 .withRegion(amazonClient.getRegion())
                 .withCredentials(new AWSStaticCredentialsProvider(credentials))
@@ -43,7 +41,6 @@ public class ImageService {
     public ResponseEntity saveImage(MultipartFile file) {
         HashMap<String, String> errors = errors(file);
         if (errors.isEmpty()) {
-            System.out.println("try save");
             String path = uploadFile(file);
             return ResponseEntity.ok(path);
         }
@@ -87,7 +84,10 @@ public class ImageService {
 
     private void uploadFileTos3bucket(String fileName, File file) {
         s3Client.putObject(amazonClient.getBucketName(), fileName, file);
-        //.withCannedAcl(CannedAccessControlList.PublicRead));
+    }
+
+    public void deleteFileFromBucket(String filename){
+        s3Client.deleteObject(amazonClient.getBucketName(),filename);
     }
 
     private String generateFileName(MultipartFile multiPart) {
@@ -95,7 +95,6 @@ public class ImageService {
     }
 
     public byte[] getImage(String fileName) {
-        System.out.println(fileName);
         S3Object s3Object = s3Client.getObject(amazonClient.getBucketName(),fileName);
         S3ObjectInputStream inputStream = s3Object.getObjectContent();
         try {
